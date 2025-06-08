@@ -1,0 +1,13 @@
+venv/
+__pycache__/
+exploration/
+*.log
+*.sqlite3
+.venv
+*.egg-info/
+*.pyc
+*.pyo
+*.pyd
+.Python
+CreatumLibre.code-workspace
+*.swp

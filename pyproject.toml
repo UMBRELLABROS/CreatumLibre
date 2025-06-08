@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "creatumlibre"
+version = "0.1.0"
+description = "Ein kreatives Grafik-Projekt mit Python"
+authors = [{name = "Martin Stottmeister", email = "marty@umbrella-brothers.de"}]
+dependencies = [
+    "opencv-python",
+    "cairocffi",
+    "pillow",
+    "numpy",
+    "pycairo",
+    "matplotlib",
+    "scipy",
+    "wand"
+]
+requires-python = ">=3.13"
