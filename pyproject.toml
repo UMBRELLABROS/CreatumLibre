@@ -3,18 +3,23 @@ requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "creatumlibre"
+name = "com.creatumlibre.www"
 version = "0.1.0"
 description = "Ein kreatives Grafik-Projekt mit Python"
 authors = [{name = "Martin Stottmeister", email = "marty@umbrella-brothers.de"}]
 dependencies = [
-    "opencv-python",
-    "cairocffi",
-    "pillow",
-    "numpy",
-    "pycairo",
-    "matplotlib",
-    "scipy",
-    "wand"
+    "opencv-python",  # Bildverarbeitung
+    "cairocffi",      # Cairo-Bindings für Grafik
+    "pillow",         # Rastergrafik-Handling
+    "numpy",          # Mathematische Operationen
+    "pycairo",        # Alternative Cairo-Bindings
+    "matplotlib",     # Plots & Visualisierung
+    "scipy",          # Wissenschaftliche Berechnungen
+    "wand"            # ImageMagick-Integration
 ]
 requires-python = ">=3.13"
+
+[tool.setuptools.packages.find]
+where = ["src"] 
+
+

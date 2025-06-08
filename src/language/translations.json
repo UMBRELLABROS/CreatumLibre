@@ -1,0 +1,56 @@
+{
+    "file:": {
+        "meaning": "File menu options",
+        "en": "File",
+        "de": "Datei",
+        "fr": "Fichier"
+    },
+    "new_file": {
+        "meaning": "Create a new document",
+        "en": "New",
+        "de": "Neu",
+        "fr": "Nouveau"
+    },
+    "open_file": {
+        "meaning": "Open an existing file",
+        "en": "Open",
+        "de": "Öffnen",
+        "fr": "Ouvrir"
+    },
+    "save_file": {
+        "meaning": "Save the current document",
+        "en": "Save",
+        "de": "Speichern",
+        "fr": "Sauvegarder"
+    },
+    "save_as_file": {
+        "meaning": "Save the current document with a new name",
+        "en": "Save As",
+        "de": "Speichern unter",
+        "fr": "Enregistrer sous"
+    },
+    "close_file": {
+        "meaning": "Close the current document",
+        "en": "Close",
+        "de": "Schließen",
+        "fr": "Fermer"
+    },
+    "exit_application": {
+        "meaning": "Exit the application",
+        "en": "Exit",
+        "de": "Beenden",
+        "fr": "Quitter"
+    },
+    "undo_action": {
+        "meaning": "Undo the last action",
+        "en": "Undo",
+        "de": "Rückgängig machen",
+        "fr": "Annuler"
+    },
+    "redo_action": {
+        "meaning": "Redo the last undone action",
+        "en": "Redo",
+        "de": "Wiederholen",        
+        "fr": "Refaire"
+    }
+}
