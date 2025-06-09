@@ -20,6 +20,11 @@ dependencies = [
 requires-python = ">=3.13"
 
 [tool.setuptools.packages.find]
-where = ["src"] 
+where = ["src"]
+exclude =["test*"]
+
+[project.scripts]
+creatumlibre = "main:main"
+
 
 

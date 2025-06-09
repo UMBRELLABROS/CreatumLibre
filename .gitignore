@@ -11,3 +11,4 @@ exploration/
 .Python
 CreatumLibre.code-workspace
 *.swp
+.DS_Store

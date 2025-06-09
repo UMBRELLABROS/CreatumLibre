@@ -1,5 +1,5 @@
 {
-    "file:": {
+    "file": {
         "meaning": "File menu options",
         "en": "File",
         "de": "Datei",
@@ -52,5 +52,35 @@
         "en": "Redo",
         "de": "Wiederholen",        
         "fr": "Refaire"
+    },
+    "brightness": {
+        "meaning": "Adjust the brightness of the image",
+        "en": "Brightness",
+        "de": "Helligkeit",
+        "fr": "Luminosité"
+    },
+    "contrast": {
+        "meaning": "Adjust the contrast of the image",
+        "en": "Contrast",
+        "de": "Kontrast",         
+        "fr": "Contraste"  
+    },
+    "color_settings": {
+        "meaning": "Adjust color settings of the image",
+        "en": "Color Settings",
+        "de": "Farbeinstellungen",
+        "fr": "Paramètres de couleur"
+    },
+    "apply_changes": {
+        "meaning": "Apply changes made to the image",
+        "en": "Apply",
+        "de": "Anwenden",
+        "fr": "Appliquer"
+    },
+    "cancel": {
+        "meaning": "Cancel the current operation",
+        "en": "Cancel",
+        "de": "Abbrechen",
+        "fr": "Annuler"
     }
 }
