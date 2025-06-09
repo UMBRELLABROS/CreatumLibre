@@ -1,19 +1,19 @@
 import tkinter as tk
 from tkinter import ttk
 from PIL import ImageTk
-from graphics.picture.brightness import adjust_brightness
-from graphics.picture.utils import convert_to_pillow
+from graphics.picture.color_adjustments import adjust_brightness, adjust_contrast, adjust_saturation
 from language.language_handler import lang_handler as lang 
 
 
 class ColorAdjustmentDialog(tk.Toplevel):
     """Dialog for adjusting color settings such as brightness and contrast."""
-    def __init__(self, parent, frame):
+    def __init__(self, parent, frame, img, selection):
         super().__init__(parent.root)
         self.parent = parent
-        self.frame = frame  
-        self.img = frame.image_ref["pil"].copy()  
-        self.original_img = self.img.copy()
+        self.frame = frame
+        self.img = img.copy()
+        self.original_img = img.copy()
+        self.selection = selection
 
         self.title(lang.get_text("color_settings"))
         self.geometry("300x300+100+100")  # Set a reasonable size and position
@@ -30,6 +30,13 @@ class ColorAdjustmentDialog(tk.Toplevel):
         self.contrast_slider = ttk.Scale(self, from_=-100, to=100, orient="horizontal", command=self.update_image)
         self.contrast_slider.pack(fill="x", expand=True)
 
+        # Saturation-Controller
+        self.saturation_label = ttk.Label(self, text=lang.get_text("saturation"))
+        self.saturation_label.pack(pady=0)
+        self.saturation_slider = ttk.Scale(self, from_=0, to=2, orient="horizontal", command=self.update_image)
+        self.saturation_slider.set(1) 
+        self.saturation_slider.pack(fill="x", expand=True)
+
         button_frame = ttk.Frame(self)
         button_frame.pack(pady=10)
         #  Apply-Button
@@ -41,11 +48,22 @@ class ColorAdjustmentDialog(tk.Toplevel):
 
     
     def update_image(self, _):
+        """Update the image based on the current slider values."""
         brightness_factor = (self.brightness_slider.get() / 100) + 1
-        self.img = adjust_brightness(self.original_img, brightness_factor)
+        contrast_factor = (self.contrast_slider.get() / 100) + 1
+        saturation_factor = self.saturation_slider.get()
+
+
+        selection_area = self.original_img.crop(self.selection.to_tuple())
+        modified_selection = adjust_brightness(selection_area, brightness_factor)
+        modified_selection = adjust_contrast(modified_selection, contrast_factor)
+        modified_selection = adjust_saturation(modified_selection, saturation_factor)
+        self.img.paste(modified_selection, (self.selection.x, self.selection.y))
 
         tk_img = ImageTk.PhotoImage(self.img)
+
         self.frame.image_ref["tk"] = tk_img  
+        self.frame.image_ref["pil"] = self.img.copy()
         self.frame.canvas.itemconfig(self.frame.image_on_canvas, image=tk_img)  
 
 
@@ -55,19 +73,20 @@ class ColorAdjustmentDialog(tk.Toplevel):
             self.img = self.original_img.copy()  
             tk_img = ImageTk.PhotoImage(self.img)
 
-            # 🎨 Restore image in the frame
-            self.frame.image_ref["tk"] = tk_img 
+            self.frame.image_ref["tk"] = tk_img  
             self.frame.image_ref["pil"] = self.img.copy() 
-            self.frame.canvas.itemconfig(self.frame.image_on_canvas, image=tk_img) 
-
-        self.destroy()  # 🔚 Close the dialog
+            self.frame.canvas.itemconfig(self.frame.image_on_canvas, image=tk_img)  
+                      
+        self.destroy() 
 
 
     def apply_changes(self):
-        self.frame.image_ref["pil"] = self.img.copy()  
-        self.frame.image_ref["tk"] = ImageTk.PhotoImage(self.img)
+        """Apply the changes to the image and update the canvas."""
+        self.frame.image_ref["pil"] = self.img.copy() 
+        self.frame.image_ref["tk"] = ImageTk.PhotoImage(self.img)  
         self.frame.canvas.itemconfig(self.frame.image_on_canvas, image=self.frame.image_ref["tk"])
-        self.destroy() 
+                   
+        self.destroy()
 
 
 

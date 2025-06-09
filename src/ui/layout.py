@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 import tkinter.filedialog
 from PIL import Image, ImageTk
+from graphics.selection import Selection
 from ui.dialogs.color_dialog import ColorAdjustmentDialog
 from ui.left_sidebar import LeftSidebar 
 
@@ -48,8 +49,6 @@ class CreatumLibreApp:
                 self.sidebar.show_vector_mode()
 
 
-
-
     def save_picture(self):
         """Save the active image with correct extension handling."""
         img_to_save = self.get_active_image()
@@ -89,10 +88,8 @@ class CreatumLibreApp:
             file_path = file_path.with_suffix(original_path.suffix)  # Force correct extension
 
         if file_path:
-            img_to_save.save(file_path)  # 💾 Save image
+            img_to_save.save(file_path)  # Save image
             print(f"Image saved successfully: {file_path}")
-
-
 
 
     def add_image_tab(self, filepath):
@@ -134,11 +131,12 @@ class CreatumLibreApp:
 
 
     # sidebar functions
-    def apply_filter(self):
-        print("Applying filter...")
+    def open_filter_dialog(self, selection=None):
+       pass
 
-    def adjust_colors(self):
-        print("Adjusting colors...")
+
+    def open_colors_dialog(self, selection=None):
+        """Open the color adjustment dialog with selection data."""
         active_tab = self.notebook.select()
         if not active_tab:
             print("Error: No active tab found!")
@@ -146,7 +144,9 @@ class CreatumLibreApp:
 
         for frame in self.notebook.winfo_children():
             if str(frame) == active_tab:
-                ColorAdjustmentDialog(self, frame) 
+                img = frame.image_ref["pil"]
+                selection = selection or Selection(0, 0, img.width, img.height) 
+                ColorAdjustmentDialog(self, frame, img, selection)  
                 break
 
 

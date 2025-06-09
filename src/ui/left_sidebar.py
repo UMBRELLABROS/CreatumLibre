@@ -45,8 +45,8 @@ class LeftSidebar(tk.Frame):
         color_icon = load_icon(ASSETS_PATH / "icons" / "colors.png")
 
         tk.Label(self.bitmap_tools, text="").pack()
-        tk.Button(self.bitmap_tools, image=filter_icon, command=self.parent.apply_filter).pack()
-        tk.Button(self.bitmap_tools, image=color_icon, command=self.parent.adjust_colors).pack()
+        tk.Button(self.bitmap_tools, image=filter_icon, command=self.parent.open_filter_dialog).pack()
+        tk.Button(self.bitmap_tools, image=color_icon, command=self.parent.open_colors_dialog).pack()
 
         # Set the image references to prevent garbage collection
         self.bitmap_tools.image_filter = filter_icon

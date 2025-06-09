@@ -65,6 +65,12 @@
         "de": "Kontrast",         
         "fr": "Contraste"  
     },
+    "saturation": {
+        "meaning": "Adjust the saturation of the image",
+        "en": "Saturation",
+        "de": "Sättigung",
+        "fr": "Saturation"
+    },
     "color_settings": {
         "meaning": "Adjust color settings of the image",
         "en": "Color Settings",
