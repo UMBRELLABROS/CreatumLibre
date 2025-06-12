@@ -1,12 +1,13 @@
-from pathlib import Path
-import tkinter.filedialog
-from PIL import ImageTk
+
+import tkinter as tk
 from graphics.selection import Selection
 from ui.dialogs.color_dialog import ColorAdjustmentDialog
 
 from ui.left_sidebar import LeftSidebar
+from ui.ui_menus.files import FilesManager
 from ui.ui_menus.zoom import ZoomManager
 from ui.ui_structure.notebook_data import ImageNotebook 
+from language.language_handler import lang_handler as lang  
 
 TEST_IMAGE_FILE = '/Users/martinstottmeister/Library/CloudStorage/OneDrive-Personal/Bilder/Eigene Aufnahmen/860.jpg'
 
@@ -21,11 +22,11 @@ class CreatumLibreApp:
         self.root.grid_columnconfigure(1, weight=1)
         self.root.grid_rowconfigure(0, weight=1)
 
-        # tabs
+        # tabs & elements
         self.notebook = ImageNotebook(self.root)
         self.zoom_manager = ZoomManager(self.notebook)
-        # left sidebar
         self.sidebar = LeftSidebar(self)
+        self.files_manager = FilesManager(self.notebook, self.sidebar)
 
         self.sidebar.grid(column=0, row=0, sticky="ns")
         self.notebook.grid(column=1, row=0, sticky="nsew")
@@ -40,56 +41,35 @@ class CreatumLibreApp:
         self.root.bind("<Control-minus>", self.zoom_manager.zoom_out)  
         self.root.bind("<Control-#>", self.zoom_manager.fit_to_frame) 
 
+        self.create_menu(self.root)
+
 
         if TEST_IMAGE_FILE:
             self.notebook.add_image_tab(TEST_IMAGE_FILE)
             self.sidebar.show_bitmap_mode()
 
-    def load_picture(self):
-        filepath = tkinter.filedialog.askopenfilename(filetypes=[("PNG files", "*.png"), ("JPEG files", "*.jpg *.jpeg")])
-        if filepath:
-            self.notebook.add_image_tab(filepath)
-            if filepath.lower().endswith((".png", ".jpg", ".jpeg", ".bmp", ".gif")):
-                self.sidebar.show_bitmap_mode()
-            elif filepath.lower().endswith(".svg"):
-                self.sidebar.show_vector_mode()
 
+    def create_menu(self, root):
+        menu = tk.Menu(root)
+        root.config(menu=menu)
+        file_menu = tk.Menu(menu, tearoff=0)
+        file_menu.add_command(label=lang.get_text("new_file"))
+        file_menu.add_command(label=lang.get_text("open_file"), command=self.files_manager.load_picture)
+        file_menu.add_command(label=lang.get_text("save_file"), command=self.files_manager.save_picture)
+        file_menu.add_separator()
+        file_menu.add_command(label=lang.get_text("exit_application"), command=root.quit)
+        menu.add_cascade(label=lang.get_text("file"), menu=file_menu)
 
-    def save_picture(self):
-        """Saves the currently active image to a file."""
-        active_frame = self.notebook.get_active_frame()  
-        if not active_frame:
-            print("Error: No active image found!")
-            return
-
-        img_to_save = active_frame.image_data.pil  
-        original_path = Path(active_frame.image_data.path)  
-
-        suggested_filename = f"{original_path.stem}_modified{original_path.suffix}"
-
-        file_path = tkinter.filedialog.asksaveasfilename(
-            initialdir=original_path.parent,
-            initialfile=suggested_filename,
-            defaultextension=original_path.suffix,
-            filetypes=[("PNG files", "*.png"), ("JPEG files", "*.jpg"), ("All files", "*.*")]
-        )
-
-        if not file_path:
-            print("Error: No file selected!")
-            return
-
-        file_path = Path(file_path)
-        if file_path.suffix == "":
-            file_path = file_path.with_suffix(original_path.suffix) 
-
-        img_to_save.save(file_path) 
-        print(f"Image saved successfully: {file_path}")
-
+        zoom_menu = tk.Menu(menu, tearoff=0)
+        zoom_menu.add_command(label=lang.get_text("zoom_in"), accelerator="Ctrl++", command=self.zoom_manager.zoom_in)
+        zoom_menu.add_command(label=lang.get_text("zoom_out"), accelerator="Ctrl+-", command=self.zoom_manager.zoom_out)
+        zoom_menu.add_command(label=lang.get_text("reset_zoom"), accelerator="Ctrl+.", command=self.zoom_manager.reset_zoom)
+        zoom_menu.add_command(label=lang.get_text("fit_to_frame"), accelerator="Ctrl+#",command=self.zoom_manager.fit_to_frame)
+        menu.add_cascade(label=lang.get_text("zoom"), menu=zoom_menu)
 
     # sidebar functions
     def open_filter_dialog(self, selection=None):
        pass
-
 
     def open_colors_dialog(self, selection=None):
         """Open a dialog to adjust color settings of the active image."""
@@ -101,7 +81,6 @@ class CreatumLibreApp:
         img = active_frame.image_data.pil  
         selection = selection or Selection(0, 0, img.width, img.height) 
         ColorAdjustmentDialog(self, active_frame, selection) 
-
 
 
     def debug_keypress(self, event):

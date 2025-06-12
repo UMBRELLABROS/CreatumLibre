@@ -22,27 +22,10 @@ class LeftSidebar(tk.Frame):
         self.vector_tools = tk.Frame(self, bg="lightgray")
         self.bitmap_tools = tk.Frame(self, bg="lightgray")
 
-        self.create_menu(parent.root)
+        
         self.create_vector_ui()
         self.create_bitmap_ui()
 
-    def create_menu(self, root):
-        menu = tk.Menu(root)
-        root.config(menu=menu)
-        file_menu = tk.Menu(menu, tearoff=0)
-        file_menu.add_command(label=lang.get_text("new_file"))
-        file_menu.add_command(label=lang.get_text("open_file"), command=self.parent.load_picture)
-        file_menu.add_command(label=lang.get_text("save_file"), command=self.parent.save_picture)
-        file_menu.add_separator()
-        file_menu.add_command(label=lang.get_text("exit_application"), command=root.quit)
-        menu.add_cascade(label=lang.get_text("file"), menu=file_menu)
-
-        zoom_menu = tk.Menu(menu, tearoff=0)
-        zoom_menu.add_command(label=lang.get_text("zoom_in"), accelerator="Ctrl++", command=self.parent.zoom_manager.zoom_in)
-        zoom_menu.add_command(label=lang.get_text("zoom_out"), accelerator="Ctrl+-", command=self.parent.zoom_manager.zoom_out)
-        zoom_menu.add_command(label=lang.get_text("reset_zoom"), accelerator="Ctrl+.", command=self.parent.zoom_manager.reset_zoom)
-        zoom_menu.add_command(label=lang.get_text("fit_to_frame"), accelerator="Ctrl+#",command=self.parent.zoom_manager.fit_to_frame)
-        menu.add_cascade(label=lang.get_text("zoom"), menu=zoom_menu)
 
     def create_vector_ui(self):
         pass  
