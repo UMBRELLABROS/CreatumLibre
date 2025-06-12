@@ -88,5 +88,41 @@
         "en": "Cancel",
         "de": "Abbrechen",
         "fr": "Annuler"
+    },
+    "zoom": {
+        "meaning": "Zoom options for the image",
+        "en": "Zoom",
+        "de": "Zoom",
+        "fr": "Zoom"
+    },
+    "zoom_in": {
+        "meaning": "Zoom in on the image",
+        "en": "Zoom In",
+        "de": "Hineinzoomen",
+        "fr": "Zoom avant"
+    },
+    "zoom_out": {
+        "meaning": "Zoom out of the image",
+        "en": "Zoom Out",
+        "de": "Herauszoomen",
+        "fr": "Zoom arrière"
+    },
+    "reset_zoom": {
+        "meaning": "Reset the zoom level to default",
+        "en": "Reset Zoom",
+        "de": "Zoom zurücksetzen",
+        "fr": "Réinitialiser le zoom"
+    },
+    "fit_to_frame": {
+        "meaning": "Fit the image to the frame",
+        "en": "Fit to Frame",
+        "de": "An Rahmen anpassen",
+        "fr": "Ajuster à la fenêtre"
+    },
+    "help": {
+        "meaning": "Help menu options",
+        "en": "Help",
+        "de": "Hilfe",
+        "fr": "Aide"
     }
 }

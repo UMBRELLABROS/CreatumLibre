@@ -1,11 +1,12 @@
 from pathlib import Path
-import tkinter as tk
-from tkinter import ttk
 import tkinter.filedialog
-from PIL import Image, ImageTk
+from PIL import ImageTk
 from graphics.selection import Selection
 from ui.dialogs.color_dialog import ColorAdjustmentDialog
-from ui.left_sidebar import LeftSidebar 
+
+from ui.left_sidebar import LeftSidebar
+from ui.ui_menus.zoom import ZoomManager
+from ui.ui_structure.notebook_data import ImageNotebook 
 
 TEST_IMAGE_FILE = '/Users/martinstottmeister/Library/CloudStorage/OneDrive-Personal/Bilder/Eigene Aufnahmen/860.jpg'
 
@@ -20,29 +21,34 @@ class CreatumLibreApp:
         self.root.grid_columnconfigure(1, weight=1)
         self.root.grid_rowconfigure(0, weight=1)
 
+        # tabs
+        self.notebook = ImageNotebook(self.root)
+        self.zoom_manager = ZoomManager(self.notebook)
         # left sidebar
         self.sidebar = LeftSidebar(self)
-        self.sidebar.grid(column=0, row=0, sticky="ns")
 
-        # tabs
-        self.notebook = ttk.Notebook(root)
+        self.sidebar.grid(column=0, row=0, sticky="ns")
         self.notebook.grid(column=1, row=0, sticky="nsew")
 
-        self.image_cache = {}
-
         # Key input bindings
-        self.root.bind("<BackSpace>", self.close_active_tab)
-        self.root.bind("<Delete>", self.close_active_tab)
+        self.root.bind("<Control-BackSpace>", self.notebook.close_active_tab())
+        self.root.bind("<Control-Delete>", self.notebook.close_active_tab())
         self.root.bind("<KeyPress>", self.debug_keypress)
 
+        self.root.bind("<Control-period>", self.zoom_manager.reset_zoom) 
+        self.root.bind("<Control-plus>", self.zoom_manager.zoom_in) 
+        self.root.bind("<Control-minus>", self.zoom_manager.zoom_out)  
+        self.root.bind("<Control-#>", self.zoom_manager.fit_to_frame) 
+
+
         if TEST_IMAGE_FILE:
-            self.add_image_tab(TEST_IMAGE_FILE)
+            self.notebook.add_image_tab(TEST_IMAGE_FILE)
             self.sidebar.show_bitmap_mode()
 
     def load_picture(self):
         filepath = tkinter.filedialog.askopenfilename(filetypes=[("PNG files", "*.png"), ("JPEG files", "*.jpg *.jpeg")])
         if filepath:
-            self.add_image_tab(filepath)
+            self.notebook.add_image_tab(filepath)
             if filepath.lower().endswith((".png", ".jpg", ".jpeg", ".bmp", ".gif")):
                 self.sidebar.show_bitmap_mode()
             elif filepath.lower().endswith(".svg"):
@@ -50,84 +56,34 @@ class CreatumLibreApp:
 
 
     def save_picture(self):
-        """Save the active image with correct extension handling."""
-        img_to_save = self.get_active_image()
-
-        if img_to_save is None:
+        """Saves the currently active image to a file."""
+        active_frame = self.notebook.get_active_frame()  
+        if not active_frame:
             print("Error: No active image found!")
             return
 
-        # Get the original file path from the active tab
-        active_tab = self.notebook.select()
-        if not active_tab:
-            print("Error: No active tab found!")
-            return
+        img_to_save = active_frame.image_data.pil  
+        original_path = Path(active_frame.image_data.path)  
 
-        for frame in self.notebook.winfo_children():
-            if str(frame) == active_tab:
-                original_path = Path(frame.image_ref["path"])  
-                break
-        else:
-            print("Error: No image path found in active tab!")
-            return
+        suggested_filename = f"{original_path.stem}_modified{original_path.suffix}"
 
-        # 🔍 Extract filename & extension dynamically
-        suggested_filename = original_path.stem + "_modified" + original_path.suffix
-
-        # Open save dialog with suggested filename
         file_path = tkinter.filedialog.asksaveasfilename(
-            initialdir=original_path.parent,  # Suggest saving in the same folder
-            initialfile=suggested_filename,  # Use modified name
-            defaultextension=original_path.suffix,  # Keep original extension
+            initialdir=original_path.parent,
+            initialfile=suggested_filename,
+            defaultextension=original_path.suffix,
             filetypes=[("PNG files", "*.png"), ("JPEG files", "*.jpg"), ("All files", "*.*")]
         )
 
-        # Ensure the extension is present
+        if not file_path:
+            print("Error: No file selected!")
+            return
+
         file_path = Path(file_path)
         if file_path.suffix == "":
-            file_path = file_path.with_suffix(original_path.suffix)  # Force correct extension
+            file_path = file_path.with_suffix(original_path.suffix) 
 
-        if file_path:
-            img_to_save.save(file_path)  # Save image
-            print(f"Image saved successfully: {file_path}")
-
-
-    def add_image_tab(self, filepath):
-        frame = ttk.Frame(self.notebook)
-        tab_title = filepath.split("/")[-1]
-        self.notebook.add(frame, text=tab_title)
-
-        if filepath not in self.image_cache:
-            img = Image.open(filepath)
-            img.thumbnail((800, 600))
-            self.image_cache[filepath] = {
-                "pil": img,  # Store PIL image
-                "tk": ImageTk.PhotoImage(img),  # Store PhotoImage
-                "path": filepath
-            }
-
-        # Create and store the canvas inside the frame
-        frame.canvas = tk.Canvas(frame, width=800, height=600)
-        frame.canvas.pack()
-        frame.image_on_canvas = frame.canvas.create_image(0, 0, anchor="nw", image=self.image_cache[filepath]["tk"])
-
-        frame.image_ref = self.image_cache[filepath]  # Store both images inside the frame
-
-
-    def close_active_tab(self, _):
-        active_tab = self.notebook.select()
-        if active_tab:
-            self.notebook.forget(active_tab)
-
-    def get_active_image(self):
-        active_tab = self.notebook.select()
-        if not active_tab:
-            return None  
-
-        for frame in self.notebook.winfo_children():
-            if str(frame) == active_tab:
-                return frame.image_ref["pil"]  
-        return None
+        img_to_save.save(file_path) 
+        print(f"Image saved successfully: {file_path}")
 
 
     # sidebar functions
@@ -136,18 +92,16 @@ class CreatumLibreApp:
 
 
     def open_colors_dialog(self, selection=None):
-        """Open the color adjustment dialog with selection data."""
-        active_tab = self.notebook.select()
-        if not active_tab:
+        """Open a dialog to adjust color settings of the active image."""
+        active_frame = self.notebook.get_active_frame()  
+        if not active_frame:
             print("Error: No active tab found!")
             return
 
-        for frame in self.notebook.winfo_children():
-            if str(frame) == active_tab:
-                img = frame.image_ref["pil"]
-                selection = selection or Selection(0, 0, img.width, img.height) 
-                ColorAdjustmentDialog(self, frame, img, selection)  
-                break
+        img = active_frame.image_data.pil  
+        selection = selection or Selection(0, 0, img.width, img.height) 
+        ColorAdjustmentDialog(self, active_frame, selection) 
+
 
 
     def debug_keypress(self, event):
