@@ -4,8 +4,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 from PIL import Image
 
-# Mock Tkinter before importing ZoomManager
-with patch("tkinter.Tk"):
+# Mock Tkinter PhotoImage globally BEFORE importing ZoomManager
+with patch("ui.ui_menus.zoom.ImageTk.PhotoImage"):
     from ui.ui_menus.zoom import ZoomManager
 
 
