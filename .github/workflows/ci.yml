@@ -10,11 +10,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install system dependencies
-        run: |
-          sudo apt update
-          sudo apt install -y libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev gcc xvfb
-
       - name: Install uv package manager
         run: curl -LsSf https://astral.sh/uv/install.sh | sh
 
@@ -27,7 +22,7 @@ jobs:
         run: uv pip install --system .
 
       - name: Install pylint and pre-commit manually
-        run: uv pip install --system pylint pre-commit pytest-xvfb
+        run: uv pip install --system pylint pre-commit
 
       - name: Set up pre-commit hooks
         run: pre-commit install
@@ -35,8 +30,5 @@ jobs:
       - name: Run linting
         run: pre-commit run --all-files
 
-      - name: Start virtual display
-        run: Xvfb :99 -screen 0 1024x768x24 &
-
-      - name: Run tests with virtual display
-        run: PYTEST_XVFB=1 xvfb-run pytest
+      - name: Run tests
+        run: pytest
