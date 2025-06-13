@@ -4,8 +4,9 @@ from unittest.mock import MagicMock, patch
 import pytest
 from PIL import Image
 
-# Mock Tkinter PhotoImage globally BEFORE importing ZoomManager
-with patch("ui.ui_menus.zoom.ImageTk.PhotoImage") as mock_photoimage:
+# Mock the entire ImageTk module globally BEFORE importing ZoomManager
+with patch("ui.ui_menus.zoom.ImageTk") as mock_imagetk:
+    mock_imagetk.PhotoImage = MagicMock()  # Ensure PhotoImage is fully mocked
     from ui.ui_menus.zoom import ZoomManager
 
 
@@ -50,15 +51,19 @@ def test_fit_to_frame(mock_photoimage, mock_zoom):
     mock_photoimage.assert_called_once()
 
 
-def test_zoom_in(mock_zoom):
-    """Tests zooming in increases zoom level."""
+@patch("ui.ui_menus.zoom.ImageTk.PhotoImage", return_value=MagicMock())
+def test_zoom_in(mock_photoimage, mock_zoom):
+    """Tests zooming in increases zoom level while mocking ImageTk.PhotoImage."""
     mock_zoom.zoom_level = 1.0
     mock_zoom.zoom_in()
-    assert mock_zoom.zoom_level > 1.0
+    assert mock_zoom.zoom_level > 1.0  # Ensure zoom level updates
+    mock_photoimage.assert_called_once()  # Make sure PhotoImage was mocked
 
 
-def test_zoom_out(mock_zoom):
-    """Tests zooming out decreases zoom level."""
+@patch("ui.ui_menus.zoom.ImageTk.PhotoImage", return_value=MagicMock())
+def test_zoom_out(mock_photoimage, mock_zoom):
+    """Tests zooming out decreases zoom level while mocking ImageTk.PhotoImage."""
     mock_zoom.zoom_level = 1.0
     mock_zoom.zoom_out()
-    assert mock_zoom.zoom_level < 1.0
+    assert mock_zoom.zoom_level < 1.0  # Ensure zoom level updates
+    mock_photoimage.assert_called_once()
