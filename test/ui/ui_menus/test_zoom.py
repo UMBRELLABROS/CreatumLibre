@@ -5,22 +5,26 @@ import pytest
 from PIL import Image
 
 # Mock Tkinter PhotoImage globally BEFORE importing ZoomManager
-with patch("ui.ui_menus.zoom.ImageTk.PhotoImage"):
+with patch("ui.ui_menus.zoom.ImageTk.PhotoImage") as mock_photoimage:
     from ui.ui_menus.zoom import ZoomManager
 
 
 @pytest.fixture
 def mock_zoom():
-    """Creates a mocked ZoomManager instance."""
-    mock_notebook = MagicMock()
-    mock_frame = MagicMock()
-    mock_notebook.get_active_frame.return_value = mock_frame
+    """Creates a mocked ZoomManager instance, including Tkinter dependencies."""
+    with patch("ui.ui_menus.zoom.ImageTk.PhotoImage") as mock_photo:
+        mock_photo.return_value = MagicMock()  # Fully mock PhotoImage
 
-    mock_frame.image_data = MagicMock()
-    mock_frame.image_data.pil = Image.new("RGB", (500, 500))
-    mock_frame.canvas = MagicMock()
+        mock_notebook = MagicMock()
+        mock_frame = MagicMock()
+        mock_notebook.get_active_frame.return_value = mock_frame
 
-    return ZoomManager(mock_notebook)
+        mock_frame.image_data = MagicMock()
+        mock_frame.image_data.pil = Image.new("RGB", (500, 500))
+        mock_frame.image_data.tk = mock_photo.return_value  # Prevent Tkinter issues
+        mock_frame.canvas = MagicMock()
+
+        return ZoomManager(mock_notebook)
 
 
 @patch("ui.ui_menus.zoom.ImageTk.PhotoImage")
