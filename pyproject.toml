@@ -10,6 +10,7 @@ authors = [{name = "Martin Stottmeister", email = "marty@umbrella-brothers.de"}]
 dependencies = [
     "opencv-python",  # Bildverarbeitung
     "cairocffi",      # Cairo-Bindings für Grafik
+    "cairo",          #
     "pillow",         # Rastergrafik-Handling
     "numpy",          # Mathematische Operationen
     "pycairo",        # Alternative Cairo-Bindings
