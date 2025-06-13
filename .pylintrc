@@ -1,0 +1,25 @@
+[MASTER]
+# Folders or modules to ignore
+ignore=venv,migrations,tests
+
+[MESSAGES CONTROL]
+# deactivate some warning, bause too restrictive
+disable=missing-docstring,invalid-name
+
+[BASIC]
+# Max line
+max-line-length=100
+
+[FORMAT]
+# indent
+indent-string='    '
+
+[DESIGN]
+# max number of methods per class
+max-attributes=10
+# max number of ancestors for a class
+max-parents=10
+[REPORTS]
+# Simle output through deactivation of scores
+output-format=colorized
+score=no

@@ -15,7 +15,10 @@ dependencies = [
     "pycairo",        # Alternative Cairo-Bindings
     "matplotlib",     # Plots & Visualisierung
     "scipy",          # Wissenschaftliche Berechnungen
-    "wand"            # ImageMagick-Integration
+    "wand",           # ImageMagick-Integration
+    "pytest",          # Test-Framework hinzufügen
+    "pytest-cov",
+    "pytest-mock"
 ]
 requires-python = ">=3.13"
 
@@ -23,8 +26,11 @@ requires-python = ">=3.13"
 where = ["src"]
 exclude =["test*"]
 
+[tool.uv.dependencies]
+pytest = "^8.1.1"
+
+[tool.isort]
+profile = "black"
+
 [project.scripts]
 creatumlibre = "main:main"
-
-
-

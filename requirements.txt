@@ -1,6 +1,6 @@
-opencv-python   # Bildverarbeitung  
-cairocffi       # Vektorgrafik (Alternative zu Cairo)  
-pillow         # Bildmanipulation  
-numpy          # Mathematische Operationen  
-pycairo        # Vektorgrafik mit Cairo  
+opencv-python   # Bildverarbeitung
+cairocffi       # Vektorgrafik (Alternative zu Cairo)
+pillow         # Bildmanipulation
+numpy          # Mathematische Operationen
+pycairo        # Vektorgrafik mit Cairo
 pandas

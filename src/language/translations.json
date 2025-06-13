@@ -50,7 +50,7 @@
     "redo_action": {
         "meaning": "Redo the last undone action",
         "en": "Redo",
-        "de": "Wiederholen",        
+        "de": "Wiederholen",
         "fr": "Refaire"
     },
     "brightness": {
@@ -62,8 +62,8 @@
     "contrast": {
         "meaning": "Adjust the contrast of the image",
         "en": "Contrast",
-        "de": "Kontrast",         
-        "fr": "Contraste"  
+        "de": "Kontrast",
+        "fr": "Contraste"
     },
     "saturation": {
         "meaning": "Adjust the saturation of the image",

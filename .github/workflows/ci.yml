@@ -1,0 +1,39 @@
+name: CI
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install uv package manager
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
+      - name: Install cairo
+        run: |
+          sudo apt update
+          sudo apt install -y libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev gcc
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.13"
+
+      - name: Install Python dependencies
+        run: uv pip install --system .
+
+      - name: Install pylint and pre-commit manually
+        run: uv pip install --system pylint pre-commit
+
+      - name: Set up pre-commit hooks
+        run: pre-commit install
+
+      - name: Run linting
+        run: pre-commit run --all-files
+
+      - name: Run tests
+        run: pytest
