@@ -35,5 +35,8 @@ jobs:
       - name: Run linting
         run: pre-commit run --all-files
 
+      - name: Install pytest-xvfb
+        run: uv pip install --system pytest-xvfb
+
       - name: Run tests
-        run: pytest
+        run: pytest --xvfb
