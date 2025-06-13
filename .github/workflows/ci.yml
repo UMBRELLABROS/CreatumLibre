@@ -6,6 +6,10 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+
+      - name: Install uv package manager
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
       - name: Install dependencies
         run: |
           sudo apt update
