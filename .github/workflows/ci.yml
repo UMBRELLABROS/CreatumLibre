@@ -6,6 +6,11 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev gcc
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -15,8 +20,7 @@ jobs:
           python-version: "3.13"
 
       - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
+        run: uv pip install .
 
       - name: Run linting
         run: pylint src/
