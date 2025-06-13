@@ -1,10 +1,15 @@
 # pylint: disable=redefined-outer-name
+import tkinter as tk
 from unittest.mock import MagicMock, patch
 
 import pytest
 from PIL import Image
 
 from ui.ui_menus.zoom import ZoomManager
+
+# Create a hidden Tkinter root window for tests
+root = tk.Tk()
+root.withdraw()  # Prevent it from showing a GUI
 
 
 @pytest.fixture
