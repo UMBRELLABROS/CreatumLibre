@@ -1,28 +1,32 @@
 import tkinter.filedialog
 from pathlib import Path
 
+
 class FilesManager:
     """Handles file operations such as loading and saving images in the application."""
+
     def __init__(self, notebook, sidebar):
         self.notebook = notebook
         self.sidebar = sidebar
 
     def load_picture(self):
         """Open a file dialog to select an image file and add it to the notebook."""
-        filepath = tkinter.filedialog.askopenfilename(filetypes=[
-            ("PNG files", "*.png"),
-            ("JPEG files", "*.jpg *.jpeg"),
-            ("Bitmap files", "*.bmp"),
-            ("GIF files", "*.gif"),
-            ("SVG files", "*.svg")
-        ])
-        
+        filepath = tkinter.filedialog.askopenfilename(
+            filetypes=[
+                ("PNG files", "*.png"),
+                ("JPEG files", "*.jpg *.jpeg"),
+                ("Bitmap files", "*.bmp"),
+                ("GIF files", "*.gif"),
+                ("SVG files", "*.svg"),
+            ]
+        )
+
         if not filepath:
             print("Error: No file selected!")
             return
 
         self.notebook.add_image_tab(filepath)
-        
+
         if filepath.lower().endswith((".png", ".jpg", ".jpeg", ".bmp", ".gif")):
             self.sidebar.show_bitmap_mode()
         elif filepath.lower().endswith(".svg"):
@@ -44,7 +48,11 @@ class FilesManager:
             initialdir=original_path.parent,
             initialfile=suggested_filename,
             defaultextension=original_path.suffix,
-            filetypes=[("PNG files", "*.png"), ("JPEG files", "*.jpg"), ("All files", "*.*")]
+            filetypes=[
+                ("PNG files", "*.png"),
+                ("JPEG files", "*.jpg"),
+                ("All files", "*.*"),
+            ],
         )
 
         if not file_path:
