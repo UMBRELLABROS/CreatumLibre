@@ -26,15 +26,10 @@ jobs:
           sudo apt update
           sudo apt install -y libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev gcc
 
-      - name: Install Qt 6 Manually
+      - name: Install Qt Dependencies
         run: |
           sudo apt update
-          sudo apt install -y wget
-          wget https://download.qt.io/official_releases/qt/6.6/6.6.0/qt-opensource-linux-x64-6.6.0.run
-          chmod +x qt-opensource-linux-x64-6.6.0.run
-          ./qt-opensource-linux-x64-6.6.0.run --script
-
-
+          sudo apt install -y qtbase5-dev qtchooser qttools5-dev-tools qttools5-dev
 
       - name: Set up Python
         uses: actions/setup-python@v4
