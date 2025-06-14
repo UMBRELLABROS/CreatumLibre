@@ -1,13 +1,12 @@
-import tkinter as tk
+import sys
 
-from ui.ui import CreatumLibreApp
+from PyQt6.QtWidgets import QApplication  # pylint: disable = no-name-in-module
+
+from ui.base import CreatumLibre
 
 
 def main():
-    root = tk.Tk()
-    CreatumLibreApp(root)
-    root.mainloop()
-
-
-if __name__ == "__main__":
-    main()
+    app = QApplication(sys.argv)
+    window = CreatumLibre()
+    window.show()
+    sys.exit(app.exec())
