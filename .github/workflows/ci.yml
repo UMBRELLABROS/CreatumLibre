@@ -26,6 +26,11 @@ jobs:
           sudo apt update
           sudo apt install -y libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev gcc
 
+      - name: Install Qt Dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y qt6-base-dev qtchooser qt6-tools qt6-tools-dev
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
