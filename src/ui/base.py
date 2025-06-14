@@ -33,16 +33,16 @@ class CreatumLibre(QMainWindow):
         # Create Tab Widget
         self.image_manager = ImageManager(self)
 
-        FileMenu(self)  # Initialize File Menu
-        ZoomMenu(self)  # Initialize Zoom Menu
-
         self.init_layout()
+
+        self.file_menu = FileMenu(self)  # Initialize File Menu
+        self.zoom_menu = ZoomMenu(self)  # Initialize Zoom Menu
 
     def init_layout(self):
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
 
-        # ✅ Ensure the main layout is fully expandable
+        # Ensure the main layout is fully expandable
         self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(0)
         self.main_layout.setSizeConstraint(QLayout.SizeConstraint.SetMinimumSize)
@@ -63,12 +63,10 @@ class CreatumLibre(QMainWindow):
         )  # Placeholder for colors
 
         top_layout.addWidget(left_sidebar, stretch=1)
-        top_layout.addWidget(
-            self.image_manager.tab_widget, stretch=9
-        )  # ✅ Ensure full expansion
+        top_layout.addWidget(self.image_manager.tab_widget, stretch=9)
         top_layout.addWidget(right_sidebar, stretch=1)
 
-        # ✅ Force the tab widget itself to be expandable
+        # Force the tab widget itself to be expandable
         self.image_manager.tab_widget.setSizePolicy(
             QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding
         )

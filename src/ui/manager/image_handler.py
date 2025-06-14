@@ -9,6 +9,7 @@ class ImageHandler:
         self.original_image = cv2.imread(file_path)  # Load with OpenCV
         self.processing_image = self.original_image.copy()  # Editable version
 
+        self.zoom_factor = 1.0
         self.undo_stack = []  # Stores previous states
         self.redo_stack = []  # Stores undone states
 
