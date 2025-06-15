@@ -2,6 +2,8 @@
 import cv2  # OpenCV for image processing
 from PyQt6.QtGui import QImage, QPixmap
 
+from graphics.selection.selection import Selection
+
 
 class ImageHandler:
     def __init__(self, file_path):
@@ -10,6 +12,7 @@ class ImageHandler:
         self.processing_image = self.original_image.copy()  # Editable version
 
         self.zoom_factor = 1.0
+        self.selection = Selection()
         self.undo_stack = []  # Stores previous states
         self.redo_stack = []  # Stores undone states
 
