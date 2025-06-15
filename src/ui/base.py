@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
     QFileDialog,
     QHBoxLayout,
@@ -10,6 +11,8 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
+from graphics.filters.enhancers import adjust_brightness
+from ui.left_sidebar.left_sidebar import LeftSidebar
 from ui.manager.image_manager import ImageManager
 from ui.menu.files import FileMenu
 from ui.menu.zoom import ZoomMenu
@@ -29,14 +32,46 @@ class CreatumLibre(QMainWindow):
 
         self.menu_bar = self.menuBar()
         self.main_layout = QVBoxLayout()
+        self.left_sidebar_layout = None
 
         # Create Tab Widget
         self.image_manager = ImageManager(self)
 
         self.init_layout()
 
+        LeftSidebar(self)
         self.file_menu = FileMenu(self)  # Initialize File Menu
         self.zoom_menu = ZoomMenu(self)  # Initialize Zoom Menu
+
+        # debug
+        test_file_path = (
+            Path("/Users/martinstottmeister/Library")
+            / "CloudStorage"
+            / "OneDrive-Personal"
+            / "Bilder"
+            / "Screenshots"
+            / "Screenshot_20221225_162528.png"
+        )
+
+        # debug
+        self.image_manager.load_new_image(test_file_path)
+
+        active_image = self.image_manager.get_active_image()
+        if active_image:
+            selection = active_image.selection  # Retrieve selection instance
+            x, y, width, height = selection.get_rect()
+
+            selected_region = active_image.processing_image[
+                y : y + height, x : x + width
+            ]  # Extract selection
+            adjusted_region = adjust_brightness(
+                selected_region, 1.3
+            )  # Apply brightness
+            active_image.processing_image[y : y + height, x : x + width] = (
+                adjusted_region  # Overlay back
+            )
+
+            self.image_manager.update_image_display()  # Refresh UI
 
     def init_layout(self):
         central_widget = QWidget()
@@ -50,14 +85,21 @@ class CreatumLibre(QMainWindow):
 
         # Top Layout (~90% of height)
         top_layout = QHBoxLayout()
-        left_sidebar = QWidget()
         right_sidebar = QWidget()
 
-        left_sidebar.setFixedWidth(80)
+        left_sidebar = QWidget()
+        left_sidebar.setFixedWidth(40)
         left_sidebar.setStyleSheet(
             "background-color: #f0fff0;"
         )  # Placeholder for left sidebar
-        right_sidebar.setFixedWidth(80)
+        self.left_sidebar_layout = QVBoxLayout(left_sidebar)
+        self.left_sidebar_layout.setContentsMargins(
+            0, 0, 0, 0
+        )  # Remove sidebar padding
+        self.left_sidebar_layout.setSpacing(0)  # Remove extra spacing
+        self.left_sidebar_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+
+        right_sidebar.setFixedWidth(40)
         right_sidebar.setStyleSheet(
             "background-color: #f0f0ff;"
         )  # Placeholder for colors

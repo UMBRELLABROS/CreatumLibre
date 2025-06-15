@@ -1,7 +1,6 @@
 # pylint: disable=no-member
 from pathlib import Path
 
-import cv2
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QLabel, QScrollArea, QTabWidget, QVBoxLayout, QWidget
 
@@ -60,16 +59,24 @@ class ImageManager:
             print("⚠️ No active image found!")
             return
 
-        pixmap = active_image.get_pixmap()  # Convert OpenCV image to QPixmap
+        zoom_factor = active_image.zoom_factor  # ✅ Ensure zoom_factor is considered
+        pixmap = active_image.get_pixmap()
 
-        # ✅ Find the correct image label inside the active tab
+        if zoom_factor != 1.0:  # ✅ Resize only if zoom is applied
+            new_width = int(pixmap.width() * zoom_factor)
+            new_height = int(pixmap.height() * zoom_factor)
+            pixmap = pixmap.scaled(
+                new_width, new_height, Qt.AspectRatioMode.KeepAspectRatio
+            )
+
+        # Find the correct image label inside the active tab
         tab_index = self.tab_widget.currentIndex()
         scroll_area = self.tab_widget.widget(tab_index)
         image_label = scroll_area.findChild(QLabel)
 
         if image_label:
             image_label.setPixmap(pixmap)
-            image_label.repaint()  # ✅ Force UI refresh
+            image_label.repaint()  # Force UI refresh
 
     def zoom_in(self):
         """Increase the zoom level of the active image."""
@@ -89,16 +96,6 @@ class ImageManager:
         active_image.zoom_factor = max(
             0.1, min(3.0, active_image.zoom_factor * factor)
         )  # Prevent extreme zoom
-        height, width = active_image.original_image.shape[:2]
-
-        new_width = int(width * active_image.zoom_factor)
-        new_height = int(height * active_image.zoom_factor)
-
-        active_image.processing_image = cv2.resize(
-            active_image.original_image,
-            (new_width, new_height),
-            interpolation=cv2.INTER_LINEAR,
-        )
 
         self.update_image_display()  #  Refresh UI
 
