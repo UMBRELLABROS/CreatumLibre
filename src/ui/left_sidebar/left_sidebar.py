@@ -1,45 +1,54 @@
 from PyQt6.QtCore import QSize
 from PyQt6.QtGui import QIcon, QPixmap
-from PyQt6.QtWidgets import QToolButton, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import QSizePolicy, QToolButton, QVBoxLayout, QWidget
 
 from ui.dialogs.color_adjustment_dialog import ColorAdjustmentDialog
+from ui.left_sidebar.left_sidebar_css import LEFT_SIDEBAR_SIMPLE_BUTTON
+from ui.mode.ui_input_mode import InputMode
+
+BUTTON_WIDTH = 40
+BUTTON_HEIGHT = 40
 
 
 class LeftSidebar(QWidget):
-    """Sidebar with an icon to open the color adjustment dialog."""
+    """Sidebar with multiple tool buttons."""
 
     def __init__(self, parent):
         super().__init__(parent)
         self.parent = parent
-
         self.color_adjustment_dialog = ColorAdjustmentDialog(
             self, self.parent.image_manager
-        )  # Pass image manager to dialog
+        )
 
-        layout = QVBoxLayout(self)
-        layout.setContentsMargins(0, 0, 0, 0)  # ✅ Remove all margins
-        layout.setSpacing(0)  # ✅ Remove spacing
+        sidebar_layout = QVBoxLayout(self)
+        sidebar_layout.setContentsMargins(0, 0, 0, 0)
+        sidebar_layout.setSpacing(20)
 
-        # ✅ Create button with fully covering icon
-        self.color_adjustment_button = QToolButton(self)
-        icon_path = "src/assets/color.png"
-        pixmap = QPixmap(icon_path).scaled(80, 80)  # ✅ Scale icon to fit button size
-        self.color_adjustment_button.setIcon(QIcon(pixmap))
+        # Create and add tool buttons
+        self.btn_color_adjustment = self._create_tool_button(
+            "src/assets/color.png", self.color_adjustment_dialog.show
+        )
+        self.btn_region = self._create_tool_button(
+            "src/assets/region.png",
+            lambda: self.parent.ui_input_mode.set_mode(InputMode.SELECT_REGION),
+        )
 
-        self.color_adjustment_button.setIconSize(
-            QSize(80, 80)
-        )  # ✅ Make icon match button size
-        self.color_adjustment_button.setStyleSheet(
-            "border: none; padding: 0px;"
-        )  # ✅ Remove borders & padding
+        sidebar_layout.addWidget(self.btn_color_adjustment)
+        sidebar_layout.addWidget(self.btn_region)
 
-        layout.addWidget(self.color_adjustment_button)
+        self.setLayout(sidebar_layout)
 
-        self.setLayout(layout)
+        # Add buttons to parent's sidebar layout
+        for button in [self.btn_color_adjustment, self.btn_region]:
+            parent.left_sidebar_layout.addWidget(button)
+            button.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
 
-        self.color_adjustment_button.clicked.connect(
-            self.color_adjustment_dialog.show
-        )  # Opens dialog
-
-        # Add button to sidebar layout
-        parent.left_sidebar_layout.addWidget(self.color_adjustment_button)
+    def _create_tool_button(self, icon_path, callback):
+        """Creates a styled tool button with an icon."""
+        button = QToolButton(self)
+        button.setIcon(QIcon(QPixmap(icon_path).scaled(BUTTON_WIDTH, BUTTON_HEIGHT)))
+        button.setIconSize(QSize(BUTTON_WIDTH, BUTTON_HEIGHT))
+        button.setStyleSheet(LEFT_SIDEBAR_SIMPLE_BUTTON)
+        if callback:
+            button.clicked.connect(callback)
+        return button

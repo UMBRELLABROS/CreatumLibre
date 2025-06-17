@@ -2,7 +2,14 @@
 from pathlib import Path
 
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QLabel, QScrollArea, QTabWidget, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import (
+    QLabel,
+    QScrollArea,
+    QSizePolicy,
+    QTabWidget,
+    QVBoxLayout,
+    QWidget,
+)
 
 from ui.manager.image_handler import ImageHandler
 
@@ -12,12 +19,19 @@ class ImageManager:
 
     def __init__(self, parent):
         self.parent = parent
+
         self.tab_widget = QTabWidget()
-        self.scroll_area = QScrollArea()
         self.tab_widget.setTabsClosable(True)
         self.tab_widget.tabCloseRequested.connect(self.tab_widget.removeTab)
         self.tab_widget.setMovable(True)
-        self.parent.main_layout.addWidget(self.tab_widget)
+        self.tab_widget.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding
+        )
+
+        self.parent.workspace_layout.addWidget(self.tab_widget)
+
+        self.image_container_widget = None
+        self.pixmap = None
 
         self.image_instances = {}  # Track images by tab index
 
@@ -26,31 +40,62 @@ class ImageManager:
         image_instance = ImageHandler(file_path)
 
         # Scrollable container
-        scroll_area = QScrollArea()
-        scroll_area.setWidgetResizable(True)
-        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
-        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
+        scroll_area_widget = QScrollArea()
+        scroll_area_widget.setWidgetResizable(True)
+        scroll_area_widget.setHorizontalScrollBarPolicy(
+            Qt.ScrollBarPolicy.ScrollBarAlwaysOn
+        )
+        scroll_area_widget.setVerticalScrollBarPolicy(
+            Qt.ScrollBarPolicy.ScrollBarAlwaysOn
+        )
 
         # Fixed image container inside the scroll area
-        image_container = QWidget()
-        layout = QVBoxLayout(image_container)
-        image_label = QLabel()
-        image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.image_container_widget = QWidget()
+        image_container_layout = QVBoxLayout(self.image_container_widget)
+        image_label_widget = QLabel()
+        image_label_widget.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         # Load image while keeping aspect ratio
         pixmap = image_instance.get_pixmap()
-        image_label.setPixmap(pixmap)
+        image_label_widget.setPixmap(pixmap)
 
-        layout.addWidget(image_label)
-        image_container.setLayout(layout)
+        image_container_layout.addWidget(image_label_widget)
+        self.image_container_widget.setLayout(image_container_layout)
 
         # Place fixed widget inside the scrollable area
-        scroll_area.setWidget(image_container)
+        scroll_area_widget.setWidget(self.image_container_widget)
 
         filename = Path(file_path).name
 
-        tab_index = self.tab_widget.addTab(scroll_area, filename)
+        tab_index = self.tab_widget.addTab(scroll_area_widget, filename)
         self.image_instances[tab_index] = image_instance
+
+    def get_widget_offset(self):
+        """Find the top-left corner of the image widget relative to the application."""
+        point = self.image_container_widget.mapTo(
+            self.parent, self.image_container_widget.rect().topLeft()
+        )
+        return point.x(), point.y()
+
+    def get_image_offset(self):
+        """Find the padding/margin of the image inside its widget."""
+        widget_rect = (
+            self.image_container_widget.geometry()
+        )  # Get actual size of the widget
+        offset_x = 0
+        offset_y = 0
+        activeImage = self.get_active_image()
+        if activeImage:
+
+            image_width, image_height = activeImage.get_zoomed_pixmap_dimension()
+
+            offset_x = (widget_rect.width() - image_width) // 2  # Centering effect
+            offset_y = (widget_rect.height() - image_height) // 2
+
+            print(f"Contianer dimension: {widget_rect}")
+            print(f"Image dimension: {image_width, image_height}")
+
+        return offset_x, offset_y  # Padding inside the widget
 
     def update_image_display(self):
         """Update the QLabel with the latest processed image."""
@@ -127,7 +172,6 @@ class ImageManager:
             f" Calculated zoom factor: {active_image.zoom_factor}, {scale_x=}, {scale_y=}"
         )
         # Resize the image
-
         self.apply_zoom(active_image.zoom_factor)  #  Use zoom logic to resize properly
         self.update_image_display()  #  Refresh UI
 
@@ -141,7 +185,7 @@ class ImageManager:
         active_image.processing_image = active_image.original_image.copy()
         active_image.zoom_factor = 1.0
 
-        self.update_image_display()  # ✅ Refresh UI
+        self.update_image_display()  # Refresh UI
 
     def get_active_image(self):
         """Retrieve the current image handler."""

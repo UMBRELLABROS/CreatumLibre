@@ -24,7 +24,7 @@ class ColorAdjustmentDialog(QDialog):
         self.image_manager = image_manager  # Reference to the image manager
 
         self.setWindowTitle("Color Adjustments")
-        self.setFixedSize(300, 450)
+        self.setFixedSize(300, 480)
 
         self.setStyleSheet(
             """
@@ -166,14 +166,10 @@ class ColorAdjustmentDialog(QDialog):
 
     def apply_all_adjustments(self):
         """Applies enhancements directly to the selection area or full image."""
-        active_image = self.image_manager.get_active_image()
-        if not active_image:
+        if (active_image := self.image_manager.get_active_image()) is None:
             return
 
-        temp_image = active_image.original_image.copy()
-        selected_region = active_image.selection.get_region(
-            temp_image
-        )  # ✅ Extract selection
+        selected_region = active_image.get_selected_region()
 
         for adjustment, config in self.slider_settings.items():
             raw_value = self.sliders[adjustment].value()
@@ -181,13 +177,11 @@ class ColorAdjustmentDialog(QDialog):
             self.labels[adjustment].setText(f"{adjustment} [{mapped_value:.2f}]")
             selected_region = config["apply_function"](
                 selected_region, mapped_value
-            )  # ✅ Modify selection
+            )  #  Modify selection
 
-        active_image.selection.set_region(
-            temp_image, selected_region
-        )  # ✅ Merge changes back
-        active_image.processing_image = temp_image
-        self.image_manager.update_image_display()
+        active_image.set_selected_region(selected_region)
+
+        self.image_manager.update_image_display()  # zoom and stuff
 
     def apply_changes(self):
         """Apply adjustments permanently to the real image."""
