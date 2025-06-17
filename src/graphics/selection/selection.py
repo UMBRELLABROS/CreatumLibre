@@ -17,6 +17,7 @@ class Selection:
         self.y = y
         self.width = width
         self.height = height
+        print(f"{x} {y} {width} {height}")
 
     def get_region(self, image):
         """Extract the selected region from an image."""
@@ -27,6 +28,7 @@ class Selection:
         """Place the modified region back into the image."""
         x, y, w, h = self.get_rect()
         image[y : y + h, x : x + w] = modified_region  # Encapsulated region placement
+        return image
 
     def contains_point(self, px, py):
         """Check if a point is inside the selection."""

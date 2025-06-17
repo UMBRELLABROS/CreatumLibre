@@ -11,11 +11,12 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-from graphics.filters.enhancers import adjust_brightness
+from ui.input.input_handler import InputHandler
 from ui.left_sidebar.left_sidebar import LeftSidebar
 from ui.manager.image_manager import ImageManager
 from ui.menu.files import FileMenu
 from ui.menu.zoom import ZoomMenu
+from ui.mode.ui_input_mode import UiMode
 
 
 class CreatumLibre(QMainWindow):
@@ -30,8 +31,12 @@ class CreatumLibre(QMainWindow):
         self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         self.resize(1200, 800)
 
+        self.ui_input_mode = UiMode("Base")
+        self.input_handler = InputHandler(self)
+        self.installEventFilter(self.input_handler)
+
         self.menu_bar = self.menuBar()
-        self.main_layout = QVBoxLayout()
+        self.workspace_layout = QVBoxLayout()
         self.left_sidebar_layout = None
 
         # Create Tab Widget
@@ -39,7 +44,6 @@ class CreatumLibre(QMainWindow):
 
         self.init_layout()
 
-        LeftSidebar(self)
         self.file_menu = FileMenu(self)  # Initialize File Menu
         self.zoom_menu = ZoomMenu(self)  # Initialize Zoom Menu
 
@@ -56,57 +60,43 @@ class CreatumLibre(QMainWindow):
         # debug
         self.image_manager.load_new_image(test_file_path)
 
-        active_image = self.image_manager.get_active_image()
-        if active_image:
-            selection = active_image.selection  # Retrieve selection instance
-            x, y, width, height = selection.get_rect()
-
-            selected_region = active_image.processing_image[
-                y : y + height, x : x + width
-            ]  # Extract selection
-            adjusted_region = adjust_brightness(
-                selected_region, 1.3
-            )  # Apply brightness
-            active_image.processing_image[y : y + height, x : x + width] = (
-                adjusted_region  # Overlay back
-            )
-
-            self.image_manager.update_image_display()  # Refresh UI
+        activeImage = self.image_manager.get_active_image()
+        activeImage.set_screen_rect(300, 300, 400, 500)
 
     def init_layout(self):
-        central_widget = QWidget()
-        self.setCentralWidget(central_widget)
+        workspace_widget = QWidget()
+        self.setCentralWidget(workspace_widget)
 
         # Ensure the main layout is fully expandable
-        self.main_layout.setContentsMargins(0, 0, 0, 0)
-        self.main_layout.setSpacing(0)
-        self.main_layout.setSizeConstraint(QLayout.SizeConstraint.SetMinimumSize)
-        central_widget.setLayout(self.main_layout)
+        self.workspace_layout.setContentsMargins(0, 0, 0, 0)
+        self.workspace_layout.setSpacing(0)
+        self.workspace_layout.setSizeConstraint(QLayout.SizeConstraint.SetMinimumSize)
+        workspace_widget.setLayout(self.workspace_layout)
 
         # Top Layout (~90% of height)
-        top_layout = QHBoxLayout()
-        right_sidebar = QWidget()
+        editor_panel_layout = QHBoxLayout()
+        right_sidebar_widget = QWidget()
 
-        left_sidebar = QWidget()
-        left_sidebar.setFixedWidth(40)
-        left_sidebar.setStyleSheet(
+        left_sidebar_widget = QWidget()
+        left_sidebar_widget.setFixedWidth(40)
+        left_sidebar_widget.setStyleSheet(
             "background-color: #f0fff0;"
         )  # Placeholder for left sidebar
-        self.left_sidebar_layout = QVBoxLayout(left_sidebar)
+        self.left_sidebar_layout = QVBoxLayout(left_sidebar_widget)
         self.left_sidebar_layout.setContentsMargins(
             0, 0, 0, 0
         )  # Remove sidebar padding
         self.left_sidebar_layout.setSpacing(0)  # Remove extra spacing
         self.left_sidebar_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
-        right_sidebar.setFixedWidth(40)
-        right_sidebar.setStyleSheet(
+        right_sidebar_widget.setFixedWidth(40)
+        right_sidebar_widget.setStyleSheet(
             "background-color: #f0f0ff;"
         )  # Placeholder for colors
 
-        top_layout.addWidget(left_sidebar, stretch=1)
-        top_layout.addWidget(self.image_manager.tab_widget, stretch=9)
-        top_layout.addWidget(right_sidebar, stretch=1)
+        editor_panel_layout.addWidget(left_sidebar_widget, stretch=1)
+        editor_panel_layout.addWidget(self.image_manager.tab_widget, stretch=9)
+        editor_panel_layout.addWidget(right_sidebar_widget, stretch=1)
 
         # Force the tab widget itself to be expandable
         self.image_manager.tab_widget.setSizePolicy(
@@ -114,12 +104,14 @@ class CreatumLibre(QMainWindow):
         )
 
         # Bottom Layout (~10% of height)
-        bottom_info_bar = QWidget()
-        bottom_info_bar.setFixedHeight(80)
-        bottom_info_bar.setStyleSheet("background-color: #fff0f0;")
+        status_bar_widget = QWidget()
+        status_bar_widget.setFixedHeight(80)
+        status_bar_widget.setStyleSheet("background-color: #fff0f0;")
 
-        self.main_layout.addLayout(top_layout, stretch=9)
-        self.main_layout.addWidget(bottom_info_bar, stretch=1)
+        self.workspace_layout.addLayout(editor_panel_layout, stretch=9)
+        self.workspace_layout.addWidget(status_bar_widget, stretch=1)
+
+        LeftSidebar(self)
 
         self.debug_sizes()
 
@@ -137,5 +129,5 @@ class CreatumLibre(QMainWindow):
     def debug_sizes(self):
         print(f"Main Window Height: {self.height()}")
         print(f"Central Widget Height: {self.centralWidget().height()}")
-        print(f"Main Layout Height: {self.main_layout.geometry().height()}")
-        print(f"Tab Widget Height: {self.image_manager.tab_widget.height()}")
+        print(f"Main Layout Height: {self.workspace_layout.geometry()}")
+        print(f"Tab Widget Geometry: {self.image_manager.tab_widget.geometry()}")
