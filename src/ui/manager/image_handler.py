@@ -15,7 +15,6 @@ class ImageHandler:
             self.original_image.copy()
         )  # Editable version with selction edges
 
-        self.zoom_factor = 1.0
         self.selection = Selection()
         self.region_manager = RegionManager()
         self.region_manager.initialize_mask(self.original_image.shape)
@@ -114,23 +113,3 @@ class ImageHandler:
         self.processing_image = self.region_manager.apply_mask(
             self.processing_image, updated_mask
         )
-
-    def apply_filter(self, filter_function):
-        """Apply a modification and save the previous state for undo."""
-        self.undo_stack.append(self.processing_image.copy())  # Store last state
-        self.processing_image = filter_function(self.processing_image)  # Modify
-
-        # Clear redo stack (new change invalidates redo history)
-        self.redo_stack.clear()
-
-    def undo(self):
-        """Undo last change if available."""
-        if self.undo_stack:
-            self.redo_stack.append(self.processing_image.copy())  # Save current state
-            self.processing_image = self.undo_stack.pop()
-
-    def redo(self):
-        """Redo last undone change if available."""
-        if self.redo_stack:
-            self.undo_stack.append(self.processing_image.copy())  # Save current state
-            self.processing_image = self.redo_stack.pop()
