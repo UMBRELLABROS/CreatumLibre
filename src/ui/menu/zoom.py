@@ -7,10 +7,10 @@ class ZoomMenu:
         zoom_menu = parent.menu_bar.addMenu("Zoom")
 
         zoom_actions = {
-            "Zoom In": ("Ctrl++", parent.image_manager.zoom_in),
-            "Zoom Out": ("Ctrl+-", parent.image_manager.zoom_out),
-            "Fit to Frame": ("Ctrl+#", parent.image_manager.fit_to_container),
-            "Reset": ("Ctrl+.", parent.image_manager.reset_zoom),
+            "Zoom In": ("Ctrl++", parent.tab_manager.zoom_in),
+            "Zoom Out": ("Ctrl+-", parent.tab_manager.zoom_out),
+            "Fit to Frame": ("Ctrl+#", parent.tab_manager.fit_to_container),
+            "Reset": ("Ctrl+.", parent.tab_manager.reset_zoom),
         }
 
         for name, (shortcut, function) in zoom_actions.items():
@@ -21,25 +21,25 @@ class ZoomMenu:
 
     def zoom_in(self):
         """Increase the zoom level of the active image."""
-        active_image = self.parent.image_manager.get_active_image()
-        if active_image:
-            active_image.apply_zoom(1.2)  # Scale up by 20%
+        active_tab = self.parent.tab_manager.get_active_tab()
+        if active_tab:
+            active_tab.apply_zoom(1.2)  # Scale up by 20%
 
     def zoom_out(self):
         """Decrease the zoom level of the active image."""
-        active_image = self.parent.image_manager.get_active_image()
-        if active_image:
-            active_image.apply_zoom(0.8)  # Scale down by 20%
+        active_tab = self.parent.tab_manager.get_active_tab()
+        if active_tab:
+            active_tab.apply_zoom(0.8)  # Scale down by 20%
 
     def fit_to_frame(self):
         """Resize image to fit within the tab without stretching."""
         print("Fitting image to frame")
-        active_image = self.parent.image_manager.get_active_image()
-        if active_image:
-            active_image.fit_to_container(self.parent.image_manager)
+        active_tab = self.parent.tab_manager.get_active_tab()
+        if active_tab:
+            active_tab.fit_to_container(self.parent.tab_manager)
 
     def reset_zoom(self):
         """Reset zoom level to default."""
-        active_image = self.parent.image_manager.get_active_image()
-        if active_image:
-            active_image.reset_zoom()
+        active_tab = self.parent.tab_manager.get_active_tab()
+        if active_tab:
+            active_tab.reset_zoom()

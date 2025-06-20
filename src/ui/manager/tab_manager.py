@@ -34,7 +34,7 @@ class TabManager:
         self.parent.workspace_layout.addWidget(self.tab_widget)
 
     def _add_scroll_container(self, filename):
-        """Add a scroll container arounf the objects"""
+        """Add a scroll container around the objects"""
         scroll_area_widget = QScrollArea()
         scroll_area_widget.setWidgetResizable(True)
         scroll_area_widget.setHorizontalScrollBarPolicy(
@@ -46,6 +46,8 @@ class TabManager:
         # Fixed image/object-manger container inside the scroll area
         object_manager_container_widget = QWidget()
         object_manager_container_layout = QVBoxLayout(object_manager_container_widget)
+        object_manager_container_layout.setContentsMargins(0, 0, 0, 0)
+
         object_manager_label_widget = QLabel()
         object_manager_label_widget.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
@@ -66,13 +68,28 @@ class TabManager:
         self.object_manager_instances[tab_index] = {
             "manager": object_manager_instance,
             "widget": object_manager_label_widget,  # Store label reference per tab
+            "file_apth": file_path,  # saved for saving
         }
 
         self.refresh_tab_display(tab_index)
+        self.tab_widget.setCurrentIndex(tab_index)
 
     def refresh_tab_display(self, tab_index):
-        # should happen in Object Mannager, but called here
-        pass
+        """Redraws the image for a specific tab by requesting a refreshed pixmap."""
+        if tab_index not in self.object_manager_instances:
+            return
+
+        obj_ref = self.object_manager_instances[tab_index]
+
+        pixmap = obj_ref[
+            "manager"
+        ].get_pixmap()  # Get final image with all objects/layers
+        self._refresh_widget(widget=obj_ref["widget"], pixmap=pixmap)
+
+    def _refresh_widget(self, widget, pixmap):
+        """update widget"""
+        widget.setPixmap(pixmap)
+        widget.repaint()
 
     def get_active_tab(self):
         """Retrieves the current ObjectManager instance safely."""
@@ -80,3 +97,61 @@ class TabManager:
             return None
 
         return self.object_manager_instances.get(current_index, None)
+
+    def get_active_tab_index(self):
+        return self.tab_widget.currentIndex()
+
+    def zoom_in(self):
+        """Increase the zoom level of the active image."""
+        self.apply_zoom(1.2)
+
+    def zoom_out(self):
+        """Decrease the zoom level of the active image."""
+        self.apply_zoom(0.8)
+
+    def apply_zoom(self, factor):
+        """Zoom in or out while maintaining aspect ratio."""
+        if (active_tab := self.get_active_tab()) is None:
+            return
+        active_tab["manager"].zoom_factor = max(
+            0.1, min(3.0, active_tab["manager"].zoom_factor * factor)
+        )  # Prevent extreme zoom
+        self._refresh_widget(active_tab["widget"], active_tab["manager"].get_pixmap())
+
+    def fit_to_container(self):
+        """Resize the image while preserving aspect ratio."""
+        print("Fitting image to container with aspect ratio")
+
+        if (active_tab := self.get_active_tab()) is None:
+            return
+
+        container_width = self.tab_widget.width()
+        container_height = self.tab_widget.height()
+
+        image_width, image_height = (
+            active_tab["manager"].get_base_image().shape[1],
+            active_tab["manager"].get_base_image().shape[0],
+        )
+
+        # Calculate the best zoom factor
+        scale_x = container_width / image_width
+        scale_y = container_height / image_height
+        active_tab["manager"].zoom_factor = max(
+            scale_x, scale_y
+        )  #  Ensures aspect ratio is preserved
+
+        print(
+            f" Calculated zoom factor: {active_tab["manager"].zoom_factor}, {scale_x=}, {scale_y=}"
+        )
+        # Resize the image
+        self.apply_zoom(
+            active_tab["manager"].zoom_factor
+        )  #  Use zoom logic to resize properly
+
+    def reset_zoom(self):
+        """Reset zoom level for active image."""
+        if (active_tab := self.get_active_tab()) is None:
+            return
+
+        active_tab["manager"].zoom_factor = 1.0
+        self._refresh_widget(active_tab["widget"], active_tab["manager"].get_pixmap())

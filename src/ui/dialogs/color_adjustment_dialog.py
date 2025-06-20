@@ -14,89 +14,39 @@ from graphics.filters.enhancers import (
     adjust_rgb,
     adjust_saturation,
 )
+from ui.dialogs.color_adjustment_dialog_css import BTN_APPLY, BTN_CANCEL, MAIN_DIALOG
 
 
 class ColorAdjustmentDialog(QDialog):
     """Dialog for adjusting brightness, saturation, contrast, and color balance."""
 
-    def __init__(self, parent, image_manager):
+    def __init__(self, parent, tab_manager):
         super().__init__(parent)
-        self.image_manager = image_manager  # Reference to the image manager
+        self.tab_manager = tab_manager  # Reference to the tab manager
+        self.apply_button = QPushButton("Apply")
+        self.cancel_button = QPushButton("Cancel")
+        self.sliders = {}
+        self.labels = {}
+        self.base_image_snapshot = None  # unchanged image
+
+        self._init_layout()
+
+    def _init_layout(self):
 
         self.setWindowTitle("Color Adjustments")
         self.setFixedSize(300, 480)
-
-        self.setStyleSheet(
-            """
-            QDialog {
-                background-color: #222831;  /* Dark background */
-                color: white;
-                border-radius: 10px;
-            }
-            QLabel {
-                font-size: 14px;
-                font-weight: bold;
-                padding: 5px;
-                color: #EEEEEE; /* Soft contrast */
-            }
-            QSlider::groove:horizontal {
-                height: 6px;
-                background: #393E46; /* Groove color */
-                border-radius: 3px;
-            }
-            QSlider::handle:horizontal {
-                background: #00ADB5; /* Handle color */
-                width: 14px;
-                height: 14px;
-                margin: -4px 0;
-                border-radius: 7px;
-            }
-        """
-        )
+        self.setStyleSheet(MAIN_DIALOG)
 
         button_layout = QHBoxLayout()
 
-        self.apply_button = QPushButton("Apply")
-        self.apply_button.setStyleSheet(
-            """
-            QPushButton {
-                background-color: #00ADB5;
-                color: white;
-                border-radius: 5px;
-                height: 30px;
-                padding: 6px;
-            }
-            QPushButton:hover {
-                background-color: #007F8F;
-            }
-        """
-        )
+        self.apply_button.setStyleSheet(BTN_APPLY)
         self.apply_button.clicked.connect(self.apply_changes)
         button_layout.addWidget(self.apply_button)
 
-        # Cancel Button
-        self.cancel_button = QPushButton("Cancel")
-        self.cancel_button.setStyleSheet(
-            """
-            QPushButton {
-                background-color: #F05454;
-                color: white;
-                border-radius: 5px;
-                height: 30px;
-                padding: 6px;
-            }
-            QPushButton:hover {
-                background-color: #D43C3C;
-            }
-        """
-        )
+        self.cancel_button.setStyleSheet(BTN_CANCEL)
         self.cancel_button.clicked.connect(self.cancel_changes)
         button_layout.addWidget(self.cancel_button)
 
-        layout = QVBoxLayout(self)
-
-        self.sliders = {}
-        self.labels = {}
         self.slider_settings = {
             "Brightness": {
                 "default": 0,
@@ -142,6 +92,8 @@ class ColorAdjustmentDialog(QDialog):
             },
         }
 
+        dialog_layout = QVBoxLayout(self)
+
         for adjustment, config in self.slider_settings.items():
             label = QLabel(
                 adjustment
@@ -156,46 +108,104 @@ class ColorAdjustmentDialog(QDialog):
 
             slider.valueChanged.connect(self.apply_all_adjustments)
 
-            layout.addWidget(label)
-            layout.addWidget(slider)
+            dialog_layout.addWidget(label)
+            dialog_layout.addWidget(slider)
             self.sliders[adjustment] = slider
 
-        layout.addLayout(button_layout)  # add buttons
-        self.setLayout(layout)
-        self.apply_all_adjustments()
+        dialog_layout.addLayout(button_layout)  # add buttons
+        self.setLayout(dialog_layout)
 
-    def apply_all_adjustments(self):
-        """Applies enhancements directly to the selection area or full image."""
-        if (active_image := self.image_manager.get_active_image()) is None:
+    def showEvent(self, event):
+        """Runs logic when the dialog is shown."""
+        super().showEvent(event)
+
+        promoted = self.get_promoted_object()
+        if promoted:
+            self.base_image_snapshot = promoted.get_image().copy()
+            self.apply_all_adjustments()
+
+            return  # Already has a promoted object
+
+        # Promote base image if no selection is active
+        active_tab = self.tab_manager.get_active_tab()
+        if not active_tab:
             return
 
-        selected_region = active_image.get_selected_region()
+        manager = active_tab.get("manager")
+        base_object = manager.get_base_object()
 
-        for adjustment, config in self.slider_settings.items():
-            raw_value = self.sliders[adjustment].value()
-            mapped_value = config["scale_function"](raw_value)
-            self.labels[adjustment].setText(f"{adjustment} [{mapped_value:.2f}]")
-            selected_region = config["apply_function"](
-                selected_region, mapped_value
-            )  #  Modify selection
+        if base_object:
+            # Promote full image as fallback
+            height, width = base_object.get_image().shape[:2]
+            fake_selection = (0, 0, width, height)
 
-        active_image.set_selected_region(selected_region)
+            # Make RegionManager believe the full image is selected
+            base_object.region_manager.set_bounding_rect(*fake_selection)
+            base_object.region_manager.initialize_mask(base_object.get_image().shape)
 
-        self.image_manager.update_image_display()  # zoom and stuff
+            new_obj = base_object.extract_selection_as_new_image()
+            if new_obj:
+                manager.add_object(new_obj)
+                self.base_image_snapshot = new_obj.get_image().copy()
+                self.apply_all_adjustments()
+                self.tab_manager.refresh_tab_display(
+                    self.tab_manager.get_active_tab_index()
+                )
+
+    def apply_all_adjustments(self):
+        promoted = self.get_promoted_object()
+        if promoted is None:
+            return
+
+        image = self.base_image_snapshot.copy()  # Work on a copy for preview
+
+        for name, config in self.slider_settings.items():
+            value = self.sliders[name].value()
+            scale = config["scale_function"](value)
+            image = config["apply_function"](image, scale)
+            mapped_value = config["scale_function"](value)
+            self.labels[name].setText(f"{name} [{mapped_value:.2f}]")
+
+        promoted.set_image(image)
+
+        self.tab_manager.refresh_tab_display(self.tab_manager.get_active_tab_index())
+
+    def get_promoted_object(self):
+        """Finds the promoted object in the current tab's object manager."""
+        active_tab = self.tab_manager.get_active_tab()
+        if not active_tab:
+            return None
+
+        object_manager = active_tab.get("manager")
+        if not object_manager:
+            return None
+
+        for obj in object_manager.object_list:
+            if getattr(obj, "is_promoted", False):
+                return obj
+        return None
 
     def apply_changes(self):
         """Apply adjustments permanently to the real image."""
-        active_image = self.image_manager.get_active_image()
-        if active_image:
-            active_image.original_image = (
-                active_image.processing_image.copy()
-            )  # Save modifications
+        promoted = self.get_promoted_object()
+        if promoted:
+            promoted.is_promoted = False
+            active_tab = self.tab_manager.get_active_tab()
+            object_manager = active_tab.get("manager")
+            object_manager.object_list.remove(promoted)
+            self.tab_manager.refresh_tab_display(
+                self.tab_manager.get_active_tab_index()
+            )
+            self.accept()
 
     def cancel_changes(self):
-        """Restore the original image before edits."""
-        active_image = self.image_manager.get_active_image()
-        if active_image:
-            active_image.processing_image = (
-                active_image.original_image.copy()
-            )  # ✅ Undo changes
-            self.image_manager.update_image_display()  # ✅ Refresh UI
+        """Cancel adjustments, delete the promoted layer"""
+        promoted = self.get_promoted_object()
+        if promoted:
+            active_tab = self.tab_manager.get_active_tab()
+            object_manager = active_tab.get("manager")
+            object_manager.object_list.remove(promoted)
+            self.tab_manager.refresh_tab_display(
+                self.tab_manager.get_active_tab_index()
+            )
+            self.reject()

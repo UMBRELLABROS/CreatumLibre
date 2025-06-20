@@ -17,7 +17,7 @@ class LeftSidebar(QWidget):
         super().__init__(parent)
         self.parent = parent
         self.color_adjustment_dialog = ColorAdjustmentDialog(
-            self, self.parent.image_manager
+            self, self.parent.tab_manager
         )
 
         sidebar_layout = QVBoxLayout(self)
