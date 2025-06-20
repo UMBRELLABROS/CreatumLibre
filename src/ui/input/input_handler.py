@@ -1,4 +1,4 @@
-from PyQt6.QtCore import QEvent, QObject, QTimer
+from PyQt6.QtCore import QEvent, QObject
 
 from ui.mode.ui_input_mode import InputMode
 
@@ -11,10 +11,36 @@ class InputHandler(QObject):
         self.parent = parent  #  Reference to UI mode for event interpretation
         self.start_pos = None
         self.end_pos = None
-        self.blink_state = True  #  For fluctuating effect
-        self.timer = QTimer()  #  Timer for blinking effect
-        self.timer.timeout.connect(self.toggle_blink)  #  Toggle state
-        self.timer.start(500)
+
+    def map_event_to_image_coordinates(self, event) -> tuple[int, int] | None:
+        """Get the real position of the mouse within the image QLabel."""
+        if (active_tab := self.parent.tab_manager.get_active_tab()) is None:
+            return None
+
+        label_widget = active_tab.get("widget")
+        if label_widget is None:
+            return None
+
+        global_pos = event.globalPosition().toPoint()
+        local_pos = label_widget.mapFromGlobal(global_pos)
+
+        # Center offset: compensate for QLabel centering the image
+        pixmap = label_widget.pixmap()
+        if pixmap is None:
+            return None
+
+        offset_x = max(0, (label_widget.width() - pixmap.width()) // 2)
+        offset_y = max(0, (label_widget.height() - pixmap.height()) // 2)
+
+        real_x = local_pos.x() - offset_x
+        real_y = local_pos.y() - offset_y
+
+        # Optional: also return unscaled pixel in original image space
+        zoom = active_tab.get("manager").zoom_factor
+        orig_x = int(real_x / zoom)
+        orig_y = int(real_y / zoom)
+
+        return orig_x, orig_y
 
     def eventFilter(self, _, event):
         """Intercept global events and delegate handling."""
@@ -32,7 +58,7 @@ class InputHandler(QObject):
     def handle_mouse_press(self, event):
         """Handles mouse press based on current mode."""
         if self.parent.ui_input_mode.get_mode() == InputMode.SELECT_REGION:
-            self.start_pos = event.pos()
+            self.start_pos = self.map_event_to_image_coordinates(event)
             print(f"Selection started at {self.start_pos}")
 
     def handle_mouse_move(self, event):
@@ -41,41 +67,31 @@ class InputHandler(QObject):
             self.parent.ui_input_mode.get_mode() == InputMode.SELECT_REGION
             and self.start_pos
         ):
-            self.end_pos = event.pos()
+            self.end_pos = self.map_event_to_image_coordinates(event)
             self.parent.update()
 
     def handle_mouse_release(self, event):
         """Handles mouse release actions."""
         if self.parent.ui_input_mode.get_mode() == InputMode.SELECT_REGION:
-            self.end_pos = event.pos()  # Set final end position
+            self.parent.ui_input_mode.set_mode(InputMode.IDLE)
+            self.end_pos = self.map_event_to_image_coordinates(
+                event
+            )  # Set final end position
+            x, y, w, h = self.process_rect_selection()  # to base-image
 
-            activeImage = self.parent.image_manager.get_active_image()
-            if activeImage:
-                x_start, y_start, width, height = self.process_rect_selection()
-                if width > 0 and height > 0:
-                    widget_x, widget_y = self.parent.image_manager.get_widget_offset()
-                    image_x, image_y = self.parent.image_manager.get_image_offset()
-                    print(f"Widget offset: {widget_x, widget_y}")
-                    print(f"Image offset: {image_x, image_y}")
-                    x, y, w, h = self.get_zoom_corrected_values(
-                        x_start - widget_x - image_x,
-                        y_start - widget_y - image_y,
-                        width,
-                        height,
-                    )
-                    activeImage.set_screen_rect(x, y, w, h)
-                else:
-                    print("Selection is empty!")
-            print(f"Selection completed: {self.start_pos} → {self.end_pos}")
+            if (active_tab := self.parent.tab_manager.get_active_tab()) is None:
+                return
 
-    def get_zoom_corrected_values(self, x, y, width, height):
-        activeImage = self.parent.image_manager.get_active_image()
-        zoom_factor = activeImage.zoom_factor  # ✅ Get current zoom level
-        orig_x_start = int((x) / zoom_factor)
-        orig_y_start = int((y) / zoom_factor)
-        orig_width = int(width / zoom_factor)
-        orig_height = int(height / zoom_factor)
-        return orig_x_start, orig_y_start, orig_width, orig_height
+            ## create image (ImageHandler)
+            parent_object = active_tab["manager"].get_active_object()
+
+            # set the selection mask
+            parent_object.region_manager.set_bounding_rect(x, y, w, h)
+
+            new_image = parent_object.extract_selection_as_new_image()
+            active_tab["manager"].add_object(new_image)  # new object in ObjectList
+
+            print(f"Image selection : {x,y,w,h}")
 
     def handle_key_press(self, _):
         """Handles key interactions based on mode."""
@@ -83,16 +99,11 @@ class InputHandler(QObject):
 
     def process_rect_selection(self):
         """Convert QPoint to integers and ensure correct ordering."""
-        x1, y1 = self.start_pos.x(), self.start_pos.y()
-        x2, y2 = self.end_pos.x(), self.end_pos.y()
+        x1, y1 = self.start_pos[0], self.start_pos[1]
+        x2, y2 = self.end_pos[0], self.end_pos[1]
 
         # Ensure coordinates are ordered correctly
         x_start, x_end = sorted([x1, x2])
         y_start, y_end = sorted([y1, y2])
         width, height = x_end - x_start, y_end - y_start
         return x_start, y_start, width, height
-
-    def toggle_blink(self):
-        """Fluctuates selection visibility."""
-        self.blink_state = not self.blink_state
-        self.parent.update()

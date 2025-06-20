@@ -13,7 +13,7 @@ from PyQt6.QtWidgets import (
 
 from ui.input.input_handler import InputHandler
 from ui.left_sidebar.left_sidebar import LeftSidebar
-from ui.manager.image_manager import ImageManager
+from ui.manager.tab_manager import TabManager
 from ui.menu.files import FileMenu
 from ui.menu.zoom import ZoomMenu
 from ui.mode.ui_input_mode import UiMode
@@ -40,7 +40,7 @@ class CreatumLibre(QMainWindow):
         self.left_sidebar_layout = None
 
         # Create Tab Widget
-        self.image_manager = ImageManager(self)
+        self.tab_manager = TabManager(self)
 
         self.init_layout()
 
@@ -58,10 +58,7 @@ class CreatumLibre(QMainWindow):
         )
 
         # debug
-        self.image_manager.load_new_image(test_file_path)
-
-        activeImage = self.image_manager.get_active_image()
-        activeImage.set_screen_rect(300, 300, 400, 500)
+        self.tab_manager.load_new_image(test_file_path)
 
     def init_layout(self):
         workspace_widget = QWidget()
@@ -95,11 +92,11 @@ class CreatumLibre(QMainWindow):
         )  # Placeholder for colors
 
         editor_panel_layout.addWidget(left_sidebar_widget, stretch=1)
-        editor_panel_layout.addWidget(self.image_manager.tab_widget, stretch=9)
+        editor_panel_layout.addWidget(self.tab_manager.tab_widget, stretch=9)
         editor_panel_layout.addWidget(right_sidebar_widget, stretch=1)
 
         # Force the tab widget itself to be expandable
-        self.image_manager.tab_widget.setSizePolicy(
+        self.tab_manager.tab_widget.setSizePolicy(
             QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding
         )
 
@@ -113,6 +110,11 @@ class CreatumLibre(QMainWindow):
 
         LeftSidebar(self)
 
+        top_left = status_bar_widget.rect().topLeft()
+        x = top_left.x()
+        y = top_left.y()
+        print(f"OFFSET: {x,y}")
+
         self.debug_sizes()
 
     def load_new_image_dialog(self):
@@ -124,10 +126,10 @@ class CreatumLibre(QMainWindow):
 
         if file_path:
             self.last_opened_folder = str(Path(file_path).parent)
-            self.image_manager.load_new_image(file_path)
+            self.tab_manager.load_new_image(file_path)
 
     def debug_sizes(self):
         print(f"Main Window Height: {self.height()}")
         print(f"Central Widget Height: {self.centralWidget().height()}")
         print(f"Main Layout Height: {self.workspace_layout.geometry()}")
-        print(f"Tab Widget Geometry: {self.image_manager.tab_widget.geometry()}")
+        print(f"Tab Widget Geometry: {self.tab_manager.tab_widget.geometry()}")
