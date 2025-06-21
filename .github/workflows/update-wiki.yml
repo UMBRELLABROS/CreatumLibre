@@ -1,0 +1,41 @@
+name: Update Wiki Docs
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  update-wiki:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install dependencies
+        run: |
+          pip install pdoc-markdown
+
+      - name: Generate Markdown docs
+        run: |
+          mkdir -p tmp_docs
+          pdoc-markdown src/creatumlibre > tmp_docs/API.md
+
+      - name: Clone Wiki
+        run: |
+          git clone https://github.com/${{ github.repository }}.wiki.git wiki
+
+      - name: Copy docs to Wiki
+        run: |
+          cp tmp_docs/API.md wiki/
+          cd wiki
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add API.md
+          git commit -m "Auto-update Wiki docs from main"
+          git push

@@ -2,7 +2,7 @@
 import cv2
 import numpy as np
 
-from ui.manager.image_handler import ImageHandler
+from creatumlibre.ui.manager.image_handler import ImageHandler
 
 
 def merge(from_obj: ImageHandler, to_obj: ImageHandler):

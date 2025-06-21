@@ -1,6 +1,6 @@
 from PyQt6.QtCore import QEvent, QObject
 
-from ui.mode.ui_input_mode import InputMode
+from creatumlibre.ui.mode.ui_input_mode import InputMode
 
 
 class InputHandler(QObject):

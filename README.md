@@ -8,6 +8,13 @@ source .venv/bin/activate
 ## run programms from exploration
 python -m exploration.first_ui
 
+## build documentation (only once)
+pdoc src/creatumlibre --output-dir docs
+
+## See documentation
+pdoc src/creatumlibre -n -h localhost -p 8000
+
+
 
 CreatumLibre (QMainWindow)
 │

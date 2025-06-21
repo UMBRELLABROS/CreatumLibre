@@ -26,6 +26,7 @@ requires-python = ">=3.13"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+include = ["creatumlibre"]
 exclude =["test*"]
 
 [tool.pylint.typecheck]
@@ -35,4 +36,4 @@ generated-members = "cv2.*"
 profile = "black"
 
 [project.scripts]
-creatumlibre = "main:main"
+creatumlibre = "creatumlibre.main:main"

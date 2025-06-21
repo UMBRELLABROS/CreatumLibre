@@ -8,13 +8,17 @@ from PyQt6.QtWidgets import (
     QVBoxLayout,
 )
 
-from graphics.filters.enhancers import (
+from creatumlibre.graphics.filters.enhancers import (
     adjust_brightness,
     adjust_contrast,
     adjust_rgb,
     adjust_saturation,
 )
-from ui.dialogs.color_adjustment_dialog_css import BTN_APPLY, BTN_CANCEL, MAIN_DIALOG
+from creatumlibre.ui.dialogs.color_adjustment_dialog_css import (
+    BTN_APPLY,
+    BTN_CANCEL,
+    MAIN_DIALOG,
+)
 
 
 class ColorAdjustmentDialog(QDialog):

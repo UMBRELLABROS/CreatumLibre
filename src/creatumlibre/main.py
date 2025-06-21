@@ -1,8 +1,8 @@
 import sys
 
-from PyQt6.QtWidgets import QApplication  # pylint: disable = no-name-in-module
+from PyQt6.QtWidgets import QApplication
 
-from ui.base import CreatumLibre
+from creatumlibre.ui.base import CreatumLibre  # pylint: disable = no-name-in-module
 
 
 def main():

@@ -11,12 +11,12 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-from ui.input.input_handler import InputHandler
-from ui.left_sidebar.left_sidebar import LeftSidebar
-from ui.manager.tab_manager import TabManager
-from ui.menu.files import FileMenu
-from ui.menu.zoom import ZoomMenu
-from ui.mode.ui_input_mode import UiMode
+from creatumlibre.ui.input.input_handler import InputHandler
+from creatumlibre.ui.left_sidebar.left_sidebar import LeftSidebar
+from creatumlibre.ui.manager.tab_manager import TabManager
+from creatumlibre.ui.menu.files import FileMenu
+from creatumlibre.ui.menu.zoom import ZoomMenu
+from creatumlibre.ui.mode.ui_input_mode import UiMode
 
 
 class CreatumLibre(QMainWindow):
