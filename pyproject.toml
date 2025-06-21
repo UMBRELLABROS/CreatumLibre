@@ -19,7 +19,8 @@ dependencies = [
     "pytest",          # Test-Framework hinzufügen
     "pytest-cov",
     "pytest-mock",
-    "PyQt6"
+    "PyQt6",
+    "pdoc"
 ]
 requires-python = ">=3.13"
 

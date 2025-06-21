@@ -6,10 +6,11 @@ from PyQt6.QtCore import QEvent, Qt
 class InputMode(Enum):
     IDLE = 0
     SELECT_REGION = 1
-    SELECT_POINT_CLOUD = 2  # ✅ Example new mode
+    SELECT_POINT_CLOUD = 2
+    MOVE_OBJECT = 3
 
 
-class SELECT_REGION(Enum):
+class MOUSE_ACTION(Enum):
     IDLE = 0  # no mode
     START = 1  # mouse down
     DRAG = 2  # mouse move
@@ -23,9 +24,9 @@ class UiMode:
 
     def __init__(self, name: str, init_key=None, key_action=None):
         self.name = name
-        self.mode = InputMode.IDLE  # ✅ Use Enum for mode state
-        self.init_key = init_key  # ✅ Store required key for mode activation
-        self.key_action = key_action  # ✅ Store required key for action execution
+        self.mode = InputMode.IDLE  # Use Enum for mode state
+        self.init_key = init_key  # Store required key for mode activation
+        self.key_action = key_action  # Store required key for action execution
 
     def set_mode(self, mode):
         """Set the UI mode."""
@@ -57,14 +58,14 @@ class UiMode:
         if event.key() == Qt.Key_Escape:
             self.reset_mode()
 
-        elif self.mode == InputMode.SELECT_REGION:
+        elif self.mode in (InputMode.SELECT_REGION, InputMode.MOVE_OBJECT):
             if event.mouseButton() == Qt.MouseButton.LeftButton:
                 if event.type() == QEvent.Type.MouseButtonPress:
-                    self.set_mode(SELECT_REGION.START)
+                    self.set_mode(MOUSE_ACTION.START)
                 elif event.type() == QEvent.Type.MouseMove:
-                    self.set_mode(SELECT_REGION.DRAG)
+                    self.set_mode(MOUSE_ACTION.DRAG)
                 elif event.type() == QEvent.Type.MouseButtonRelease:
-                    self.set_mode(SELECT_REGION.STOP)
+                    self.set_mode(MOUSE_ACTION.STOP)
         elif self.mode == InputMode.SELECT_POINT_CLOUD and event.key() == self.init_key:
             self.set_mode(InputMode.IDLE)
         elif self.key_action and event.key() == self.key_action:

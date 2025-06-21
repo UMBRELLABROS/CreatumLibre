@@ -185,7 +185,7 @@ class ColorAdjustmentDialog(QDialog):
                 return obj
         return None
 
-    def apply_changes(self):
+    def apply_changes_old(self):
         """Apply adjustments permanently to the real image."""
         promoted = self.get_promoted_object()
         if promoted:
@@ -197,6 +197,12 @@ class ColorAdjustmentDialog(QDialog):
                 self.tab_manager.get_active_tab_index()
             )
             self.accept()
+
+    def apply_changes(self):
+        obj_manager = self.tab_manager.get_active_tab().get("manager")
+        obj_manager.merge_selection()
+        self.tab_manager.refresh_tab_display(self.tab_manager.get_active_tab_index())
+        self.accept()
 
     def cancel_changes(self):
         """Cancel adjustments, delete the promoted layer"""
