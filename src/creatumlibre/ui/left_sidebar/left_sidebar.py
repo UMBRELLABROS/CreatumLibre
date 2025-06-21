@@ -2,9 +2,9 @@ from PyQt6.QtCore import QSize
 from PyQt6.QtGui import QIcon, QPixmap
 from PyQt6.QtWidgets import QSizePolicy, QToolButton, QVBoxLayout, QWidget
 
-from ui.dialogs.color_adjustment_dialog import ColorAdjustmentDialog
-from ui.left_sidebar.left_sidebar_css import LEFT_SIDEBAR_SIMPLE_BUTTON
-from ui.mode.ui_input_mode import InputMode
+from creatumlibre.ui.dialogs.color_adjustment_dialog import ColorAdjustmentDialog
+from creatumlibre.ui.left_sidebar.left_sidebar_css import LEFT_SIDEBAR_SIMPLE_BUTTON
+from creatumlibre.ui.mode.ui_input_mode import InputMode
 
 BUTTON_WIDTH = 40
 BUTTON_HEIGHT = 40

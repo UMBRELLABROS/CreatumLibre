@@ -1,6 +1,6 @@
 import numpy as np
 
-from graphics.selection.region_manager import RegionManager
+from creatumlibre.graphics.selection.region_manager import RegionManager
 
 
 class ImageHandler:

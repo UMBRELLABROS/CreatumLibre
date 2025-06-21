@@ -3,8 +3,8 @@
 import cv2
 from PyQt6.QtGui import QImage, QPixmap
 
-from graphics.boolean_operations.image_boolean import merge
-from ui.manager.image_handler import ImageHandler
+from creatumlibre.graphics.boolean_operations.image_boolean import merge
+from creatumlibre.ui.manager.image_handler import ImageHandler
 
 
 class ObjectManager:

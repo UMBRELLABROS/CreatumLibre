@@ -11,7 +11,7 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-from ui.manager.object_manager import ObjectManager
+from creatumlibre.ui.manager.object_manager import ObjectManager
 
 
 class TabManager:
