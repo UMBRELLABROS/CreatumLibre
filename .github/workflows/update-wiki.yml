@@ -1,8 +1,11 @@
 name: Deploy HTML Docs to GitHub Pages
 
-on:
-  push:
-    branches: [push] # main
+#on:
+#  push:
+#    branches: [main] # main
+
+on: [push]
+
 
 jobs:
   build-and-deploy:
