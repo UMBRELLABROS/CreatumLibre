@@ -1,9 +1,9 @@
 # pylint: disable=no-member
 
 import cv2
-import numpy as np
 from PyQt6.QtGui import QImage, QPixmap
 
+from graphics.boolean_operations.image_boolean import merge
 from ui.manager.image_handler import ImageHandler
 
 
@@ -43,43 +43,25 @@ class ObjectManager:
         if not self.object_list:
             return QPixmap()
 
-        base_image = self.object_list[0].get_image().copy()
+        base_image = self.object_list[0].copy()
 
         for image_obj in self.object_list[1:]:
-            overlay = image_obj.get_image()
-            if image_obj.is_promoted:
-                h, w = overlay.shape[:2]
+            overlay_obj = image_obj.copy()
+            if overlay_obj.is_promoted:
+                promoted_overlay_obj = overlay_obj.copy()
+                h, w = promoted_overlay_obj.get_image().shape[:2]
                 cv2.rectangle(
-                    overlay,
+                    promoted_overlay_obj.get_image(),
                     (0, 0),
                     (w - 1, h - 1),
                     (255, 0, 255),
                     thickness=int(1 / self.zoom_factor),
                 )
-            mask = image_obj.get_mask()
-            x, y = image_obj.get_position()
+                merge(promoted_overlay_obj, base_image)
+            else:
+                merge(overlay_obj, base_image)
 
-            base_image = self._blend_layer(base_image, overlay, mask, (x, y))
-
-        return self._to_qpixmap(base_image)
-
-    def _blend_layer(self, base, overlay, mask, position):
-        """Blends an overlay image onto the base using an optional alpha mask."""
-        x, y = position
-        h, w = overlay.shape[:2]
-        roi = base[y : y + h, x : x + w].astype(np.float32)
-        overlay = overlay.astype(np.float32)
-
-        if mask is not None:
-            alpha = mask.astype(np.float32)
-            if len(alpha.shape) == 2:  # Convert to 3-channel alpha if needed
-                alpha = cv2.merge([alpha, alpha, alpha])
-        else:
-            alpha = np.ones_like(overlay, dtype=np.float32)
-
-        blended = overlay * alpha + roi * (1 - alpha)
-        base[y : y + h, x : x + w] = blended.astype(np.uint8)
-        return base
+        return self._to_qpixmap(base_image.get_image())
 
     def _to_qpixmap(self, image) -> QPixmap:
         """Converts cv2 image (BGR) to QPixmap with zoom applied."""
@@ -112,3 +94,25 @@ class ObjectManager:
     def get_pixmap(self) -> QPixmap:
         """Convenience method for tab manager to retrieve full composition."""
         return self.show_resulting_image()
+
+    def merge_selection(self):
+        """Finds the promoted object and merges it into the layer below."""
+        # Find promoted ImageHandler
+        promoted = next(
+            (obj for obj in self.object_list if getattr(obj, "is_promoted", False)),
+            None,
+        )
+        if not promoted:
+            return
+
+        index = self.object_list.index(promoted)
+        if index == 0:
+            # No underlying layer to merge into
+            return
+
+        target = self.object_list[index - 1]
+
+        merge(from_obj=promoted, to_obj=target)
+
+        # Remove promoted selection from stack
+        self.object_list.remove(promoted)

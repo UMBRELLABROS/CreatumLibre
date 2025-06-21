@@ -8,6 +8,12 @@ class RegionManager:
         self.mask = None  # Stores selection mask (0-255)
         self.bounding_rect = None  # Stores current selection bounds
 
+    def copy(self):
+        new = RegionManager()
+        new.mask = self.mask.copy()
+        new.bounding_rect = self.bounding_rect
+        return new
+
     def set_bounding_rect(self, x: int, y: int, width: int, height: int):
         self.bounding_rect = (x, y, width, height)
 

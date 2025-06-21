@@ -13,6 +13,13 @@ class ImageHandler:
         self.region_manager = RegionManager()
         self.region_manager.initialize_mask(self.original_image.shape)
 
+    def copy(self):
+        new = ImageHandler(self.original_image.copy())
+        new.position = self.position  # Assuming it's immutable (like a tuple)
+        new.is_promoted = self.is_promoted
+        new.region_manager = self.region_manager.copy()
+        return new
+
     def get_image(self) -> np.ndarray:
         """Returns the raw image array."""
         return self.original_image

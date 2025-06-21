@@ -17,8 +17,7 @@ class InputHandler(QObject):
         if (active_tab := self.parent.tab_manager.get_active_tab()) is None:
             return None
 
-        label_widget = active_tab.get("widget")
-        if label_widget is None:
+        if (label_widget := active_tab.get("widget")) is None:
             return None
 
         global_pos = event.globalPosition().toPoint()
