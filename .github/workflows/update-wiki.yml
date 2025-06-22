@@ -39,11 +39,11 @@ jobs:
       - name: Generate docs
         run: pdoc src/creatumlibre --output-dir docs
 
+      - name: Generate custom index
+        run: python scripts/generate_index.py
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: docs
-
-      - name: Generate custom index
-        run: python scripts/generate_index.py
