@@ -1,7 +1,163 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="refresh" content="0; url=./creatumlibre.html"/>
+  <meta charset="UTF-8">
+  <title>CreatumLibre Docs</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 900px;
+      margin: 2rem auto;
+      line-height: 1.6;
+    }
+    .path {
+      font-weight: bold;
+      margin-top: 1rem;
+      font-size: 12px;
+    }
+    .classname {
+      font-size: 14px;
+      font-weight: bold;
+      margin: 0.3rem 0;
+    }
+    .docstring {
+      font-size: 10px;
+      margin-left: 1rem;
+      color: #555;
+    }
+    .methods {
+        font-size:10px;
+        color:#302193;
+        margin-left:1rem;
+    }
+  </style>
 </head>
+<body>
+  <h1>CreatumLibre — Module Index</h1>
+
+    <div class="path">src/creatumlibre/graphics/selection/region_manager.py</div>
+    <div class="classname">
+      <a href="https://umbrellabros.github.io/CreatumLibre/creatumlibre/graphics/selection/region_manager.html">RegionManager</a>
+    </div>
+    <div class="docstring">Handles selection modifications, mask updates, and dynamic resizing.</div>
+
+    <div class="methods">
+        copy · set_bounding_rect · get_bounding_rect · get_mask · initialize_mask · update_mask · apply_mask
+    </div>
+
+
+    <div class="path">src/creatumlibre/graphics/selection/selection.py</div>
+    <div class="classname">
+      <a href="https://umbrellabros.github.io/CreatumLibre/creatumlibre/graphics/selection/selection.html">Selection</a>
+    </div>
+    <div class="docstring">Handles selection areas within an image.</div>
+
+    <div class="methods">
+        get_rect · set_rect · get_region · set_region · contains_point
+    </div>
+
+
+    <div class="path">src/creatumlibre/ui/base.py</div>
+    <div class="classname">
+      <a href="https://umbrellabros.github.io/CreatumLibre/creatumlibre/ui/base.html">CreatumLibre</a>
+    </div>
+    <div class="docstring">[No docstring]</div>
+
+    <div class="methods">
+        init_layout · load_new_image_dialog · debug_sizes
+    </div>
+
+
+    <div class="path">src/creatumlibre/ui/dialogs/color_adjustment_dialog.py</div>
+    <div class="classname">
+      <a href="https://umbrellabros.github.io/CreatumLibre/creatumlibre/ui/dialogs/color_adjustment_dialog.html">ColorAdjustmentDialog</a>
+    </div>
+    <div class="docstring">Dialog for adjusting brightness, saturation, contrast, and color balance.</div>
+
+    <div class="methods">
+        _init_layout · showEvent · apply_all_adjustments · get_promoted_object · apply_changes_old · apply_changes · cancel_changes
+    </div>
+
+
+    <div class="path">src/creatumlibre/ui/input/input_handler.py</div>
+    <div class="classname">
+      <a href="https://umbrellabros.github.io/CreatumLibre/creatumlibre/ui/input/input_handler.html">InputHandler</a>
+    </div>
+    <div class="docstring">Handles global key and mouse events.</div>
+
+    <div class="methods">
+        map_event_to_image_coordinates · eventFilter · handle_mouse_press · handle_mouse_move · handle_mouse_release · handle_key_press · process_rect_selection
+    </div>
+
+
+    <div class="path">src/creatumlibre/ui/left_sidebar/left_sidebar.py</div>
+    <div class="classname">
+      <a href="https://umbrellabros.github.io/CreatumLibre/creatumlibre/ui/left_sidebar/left_sidebar.html">LeftSidebar</a>
+    </div>
+    <div class="docstring">Sidebar with multiple tool buttons.</div>
+
+    <div class="methods">
+        _create_tool_button
+    </div>
+
+
+    <div class="path">src/creatumlibre/ui/manager/image_handler.py</div>
+    <div class="classname">
+      <a href="https://umbrellabros.github.io/CreatumLibre/creatumlibre/ui/manager/image_handler.html">ImageHandler</a>
+    </div>
+    <div class="docstring">Handles a single image object: pixel data, selection, and position.</div>
+
+    <div class="methods">
+        copy · get_image · set_image · set_position · get_position · get_mask · extract_selection_as_new_image
+    </div>
+
+
+    <div class="path">src/creatumlibre/ui/manager/object_manager.py</div>
+    <div class="classname">
+      <a href="https://umbrellabros.github.io/CreatumLibre/creatumlibre/ui/manager/object_manager.html">ObjectManager</a>
+    </div>
+    <div class="docstring">Manages rectangular images (with optional masks) to produce one composited picture.</div>
+
+    <div class="methods">
+        _add_new_image_by_filename · get_base_image · get_active_image · get_active_object · get_base_object · show_resulting_image · _to_qpixmap · delete_object · add_object · select_object · get_pixmap · merge_selection
+    </div>
+
+
+    <div class="path">src/creatumlibre/ui/manager/tab_manager.py</div>
+    <div class="classname">
+      <a href="https://umbrellabros.github.io/CreatumLibre/creatumlibre/ui/manager/tab_manager.html">TabManager</a>
+    </div>
+    <div class="docstring">Manages loading new image to object list (positon[0]), tab creation, and scrolling.</div>
+
+    <div class="methods">
+        _init_layout · _add_scroll_container · load_new_image · refresh_tab_display · _refresh_widget · get_active_tab · get_active_tab_index · zoom_in · zoom_out · apply_zoom · fit_to_container · reset_zoom
+    </div>
+
+
+    <div class="path">src/creatumlibre/ui/menu/files.py</div>
+    <div class="classname">
+      <a href="https://umbrellabros.github.io/CreatumLibre/creatumlibre/ui/menu/files.html">FileMenu</a>
+    </div>
+    <div class="docstring">[No docstring]</div>
+
+
+    <div class="path">src/creatumlibre/ui/menu/zoom.py</div>
+    <div class="classname">
+      <a href="https://umbrellabros.github.io/CreatumLibre/creatumlibre/ui/menu/zoom.html">ZoomMenu</a>
+    </div>
+    <div class="docstring">[No docstring]</div>
+
+    <div class="methods">
+        zoom_in · zoom_out · fit_to_frame · reset_zoom
+    </div>
+
+
+    <div class="path">src/creatumlibre/ui/mode/ui_input_mode.py</div>
+    <div class="classname">
+      <a href="https://umbrellabros.github.io/CreatumLibre/creatumlibre/ui/mode/ui_input_mode.html">InputMode</a>
+    </div>
+    <div class="docstring">[No docstring]</div>
+
+
+</body>
 </html>

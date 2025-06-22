@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CreatumLibre Docs</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 900px;
+      margin: 2rem auto;
+      line-height: 1.6;
+    }
+    .path {
+      font-weight: bold;
+      margin-top: 1rem;
+      font-size: 12px;
+    }
+    .classname {
+      font-size: 14px;
+      font-weight: bold;
+      margin: 0.3rem 0;
+    }
+    .docstring {
+      font-size: 10px;
+      margin-left: 1rem;
+      color: #555;
+    }
+    .methods {
+        font-size:10px;
+        color:#302193;
+        margin-left:1rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>CreatumLibre — Module Index</h1>
+  {% for entry in entries %}
+    <div class="path">{{ entry.module_path }}</div>
+    <div class="classname">
+      <a href="{{ entry.link }}">{{ entry.class_name }}</a>
+    </div>
+    <div class="docstring">{{ entry.doc_string }}</div>
+    {% if entry.methods %}
+    <div class="methods">
+        {{ entry.methods | join(' · ') }}
+    </div>
+    {% endif %}
+  {% endfor %}
+</body>
+</html>

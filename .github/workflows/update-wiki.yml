@@ -1,10 +1,11 @@
 name: Deploy HTML Docs to GitHub Pages
 
+
+on: [push]
 #on:
 #  push:
 #    branches: [main]
 
-on: [push]
 
 jobs:
   build-and-deploy:
@@ -43,3 +44,6 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: docs
+
+      - name: Generate custom index
+        run: python scripts/generate_index.py
