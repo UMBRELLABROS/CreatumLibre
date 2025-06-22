@@ -1,41 +1,49 @@
-name: Update Wiki Docs
+name: Deploy HTML Docs to GitHub Pages
 
-on:
-  push:
-    branches: [main]
+
+on: [push]
+#on:
+#  push:
+#    branches: [main]
+
 
 jobs:
-  update-wiki:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout project
+      - name: Checkout repo
         uses: actions/checkout@v4
+
+      - name: Install uv package manager
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
+      - name: Install system libraries
+        run: |
+          sudo apt update
+          sudo apt install -y \
+            libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev gcc \
+            qtbase5-dev qtchooser qttools5-dev-tools qttools5-dev
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
+          python-version: "3.13"
 
-      - name: Install dependencies
-        run: |
-          pip install pdoc-markdown
+      - name: Install Python project dependencies
+        run: uv pip install --system .
 
-      - name: Generate Markdown docs
-        run: |
-          mkdir -p tmp_docs
-          pdoc-markdown src/creatumlibre > tmp_docs/API.md
+      - name: Install pdoc
+        run: uv pip install --system pdoc
 
-      - name: Clone Wiki
-        run: |
-          git clone https://github.com/${{ github.repository }}.wiki.git wiki
+      - name: Generate docs
+        run: pdoc src/creatumlibre --output-dir docs
 
-      - name: Copy docs to Wiki
-        run: |
-          cp tmp_docs/API.md wiki/
-          cd wiki
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add API.md
-          git commit -m "Auto-update Wiki docs from main"
-          git push
+      - name: Generate custom index
+        run: python scripts/generate_index.py
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs

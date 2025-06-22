@@ -20,7 +20,8 @@ dependencies = [
     "pytest-cov",
     "pytest-mock",
     "PyQt6",
-    "pdoc"
+    "pdoc",
+    "jinja2"
 ]
 requires-python = ">=3.13"
 
