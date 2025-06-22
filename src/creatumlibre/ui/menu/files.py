@@ -4,6 +4,8 @@ from PyQt6.QtGui import QAction, QKeySequence
 
 
 class FileMenu:
+    """Actions for file management, like load, and save"""
+
     def __init__(self, parent):
         file_menu = parent.menu_bar.addMenu("Files")
 

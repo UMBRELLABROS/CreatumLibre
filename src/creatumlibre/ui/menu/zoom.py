@@ -2,6 +2,8 @@ from PyQt6.QtGui import QAction, QKeySequence
 
 
 class ZoomMenu:
+    """Zoom funcitons to scale the image"""
+
     def __init__(self, parent):
         self.parent = parent
         zoom_menu = parent.menu_bar.addMenu("Zoom")

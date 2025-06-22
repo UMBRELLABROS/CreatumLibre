@@ -19,7 +19,7 @@ from creatumlibre.ui.menu.zoom import ZoomMenu
 from creatumlibre.ui.mode.ui_input_mode import UiMode
 
 
-class CreatumLibre(QMainWindow):
+class RootUi(QMainWindow):
     def __init__(self):
         super().__init__()
 
