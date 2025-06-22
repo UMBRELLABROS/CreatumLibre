@@ -3,20 +3,6 @@ from enum import Enum
 from PyQt6.QtCore import QEvent, Qt
 
 
-class InputMode(Enum):
-    IDLE = 0
-    SELECT_REGION = 1
-    SELECT_POINT_CLOUD = 2
-    MOVE_OBJECT = 3
-
-
-class MOUSE_ACTION(Enum):
-    IDLE = 0  # no mode
-    START = 1  # mouse down
-    DRAG = 2  # mouse move
-    STOP = 3  # mouse up
-
-
 class UiMode:
     """
     Handles UI interaction modes like selecting regions, point clouds, etc.
@@ -72,3 +58,17 @@ class UiMode:
             # Execute the action associated with the key
             print(f"Executing action for key: {self.key_action}")
             # Here you would call the actual function that handles the action
+
+
+class InputMode(Enum):
+    IDLE = 0
+    SELECT_REGION = 1
+    SELECT_POINT_CLOUD = 2
+    MOVE_OBJECT = 3
+
+
+class MOUSE_ACTION(Enum):
+    IDLE = 0  # no mode
+    START = 1  # mouse down
+    DRAG = 2  # mouse move
+    STOP = 3  # mouse up
