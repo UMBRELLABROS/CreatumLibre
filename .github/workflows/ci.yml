@@ -21,10 +21,10 @@ jobs:
       - name: Install uv package manager
         run: curl -LsSf https://astral.sh/uv/install.sh | sh
 
-      - name: Install cairo
-        run: |
-          sudo apt update
-          sudo apt install -y libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev gcc
+      # - name: Install cairo
+      #   run: |
+      #     sudo apt update
+      #     sudo apt install -y libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev gcc
 
       - name: Install Qt Dependencies
         run: |
@@ -35,6 +35,9 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: "3.13"
+
+      - name: Install project as editable
+        run: pip install -e src
 
       - name: Install Python dependencies
         run: uv pip install --system .
