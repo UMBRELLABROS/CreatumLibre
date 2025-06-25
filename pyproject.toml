@@ -3,7 +3,7 @@ requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "com.creatumlibre.www"
+name = "creatumlibre"
 version = "0.1.0"
 description = "Ein kreatives Grafik-Projekt mit Python"
 authors = [{name = "Martin Stottmeister", email = "marty@umbrella-brothers.de"}]
