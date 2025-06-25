@@ -69,6 +69,28 @@
     </div>
     
   
+    <div class="path">src/creatumlibre/ui/dialogs/dialog_manager.py</div>
+    <div class="classname">
+      <a href="https://umbrellabros.github.io/CreatumLibre/creatumlibre/ui/dialogs/dialog_manager.html">DialogManager</a>
+    </div>
+    <div class="docstring">handle the open dialogs</div>
+    
+    <div class="methods">
+        add_dialog · remove_dialog · show · exec · update
+    </div>
+    
+  
+    <div class="path">src/creatumlibre/ui/dialogs/object_manager_dialog.py</div>
+    <div class="classname">
+      <a href="https://umbrellabros.github.io/CreatumLibre/creatumlibre/ui/dialogs/object_manager_dialog.html">ObjectManagerDialog</a>
+    </div>
+    <div class="docstring">A dialog to show and manipulate the layers</div>
+    
+    <div class="methods">
+        populate_layer_list · refresh
+    </div>
+    
+  
     <div class="path">src/creatumlibre/ui/input/input_handler.py</div>
     <div class="classname">
       <a href="https://umbrellabros.github.io/CreatumLibre/creatumlibre/ui/input/input_handler.html">InputHandler</a>
@@ -76,7 +98,7 @@
     <div class="docstring">Handles global key and mouse events.</div>
     
     <div class="methods">
-        map_event_to_image_coordinates · eventFilter · handle_mouse_press · handle_mouse_move · handle_mouse_release · handle_key_press · process_rect_selection
+        map_event_to_image_coordinates · eventFilter · handle_mouse_press · handle_mouse_move · handle_mouse_release · create_new_image_object_from_selection · handle_key_press · process_rect_selection
     </div>
     
   
@@ -98,7 +120,7 @@
     <div class="docstring">Handles a single image object: pixel data, selection, and position.</div>
     
     <div class="methods">
-        copy · get_image · set_image · set_position · get_position · get_mask · extract_selection_as_new_image
+        copy · get_image · contains_point · get_pixmap · set_image · set_position · get_position · get_mask · extract_selection_as_new_image · draw_selection_frame
     </div>
     
   
@@ -109,7 +131,7 @@
     <div class="docstring">Manages rectangular images (with optional masks) to produce one composited picture.</div>
     
     <div class="methods">
-        _add_new_image_by_filename · get_base_image · get_active_image · get_active_object · get_base_object · show_resulting_image · _to_qpixmap · delete_object · add_object · select_object · get_pixmap · merge_selection
+        get_active_object_index · _add_new_image_by_filename · get_base_image · get_active_image · get_promoted_object · get_active_object · get_base_object · show_resulting_image · _to_qpixmap · delete_object · add_object · select_object · set_selected_object_by_click · update_selected_position · clear_selection · copy_promoted · delete_promoted · get_tab_pixmap · merge_selection
     </div>
     
   
@@ -120,7 +142,7 @@
     <div class="docstring">Manages loading new image to object list (positon[0]), tab creation, and scrolling.</div>
     
     <div class="methods">
-        _init_layout · _add_scroll_container · load_new_image · refresh_tab_display · _refresh_widget · get_active_tab · get_active_tab_index · zoom_in · zoom_out · apply_zoom · fit_to_container · reset_zoom
+        _init_layout · _add_scroll_container · load_new_image · refresh_tab_display · refresh_active_tab_display · _refresh_widget · get_active_tab · get_active_tab_index · zoom_in · zoom_out · apply_zoom · fit_to_container · reset_zoom
     </div>
     
   
@@ -157,7 +179,7 @@
     <div class="classname">
       <a href="https://umbrellabros.github.io/CreatumLibre/creatumlibre/ui/root_ui.html">RootUi</a>
     </div>
-    <div class="docstring">[No docstring]</div>
+    <div class="docstring">root class, container of the app</div>
     
     <div class="methods">
         init_layout · load_new_image_dialog · debug_sizes
