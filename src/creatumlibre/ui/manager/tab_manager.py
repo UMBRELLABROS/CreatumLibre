@@ -27,7 +27,10 @@ class TabManager:
     def _init_layout(self):
         self.tab_widget.setTabsClosable(True)
         self.tab_widget.tabCloseRequested.connect(self.tab_widget.removeTab)
+        # self.tab_widget.installEventFilter(self.parent.input_handler)
         self.tab_widget.setMovable(True)
+        self.tab_widget.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        self.tab_widget.setFocus()
         self.tab_widget.setSizePolicy(
             QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding
         )
@@ -81,12 +84,17 @@ class TabManager:
 
         obj_ref = self.object_manager_instances[tab_index]
 
-        pixmap = obj_ref[
+        tab_pixmap = obj_ref[
             "manager"
-        ].get_pixmap()  # Get final image with all objects/layers
-        self._refresh_widget(widget=obj_ref["widget"], pixmap=pixmap)
+        ].get_tab_pixmap()  # Get final image with all objects/layers
+        self._refresh_widget(widget=obj_ref["widget"], pixmap=tab_pixmap)
 
-    def _refresh_widget(self, widget, pixmap):
+    def refresh_active_tab_display(self):
+        """Convinience methot to update the tab"""
+        active_tab = self.get_active_tab_index()
+        self.refresh_tab_display(active_tab)
+
+    def _refresh_widget(self, widget: QWidget, pixmap):
         """update widget"""
         widget.setPixmap(pixmap)
         widget.repaint()
@@ -109,14 +117,16 @@ class TabManager:
         """Decrease the zoom level of the active image."""
         self.apply_zoom(0.8)
 
-    def apply_zoom(self, factor):
+    def apply_zoom(self, factor: float):
         """Zoom in or out while maintaining aspect ratio."""
         if (active_tab := self.get_active_tab()) is None:
             return
         active_tab["manager"].zoom_factor = max(
             0.1, min(3.0, active_tab["manager"].zoom_factor * factor)
         )  # Prevent extreme zoom
-        self._refresh_widget(active_tab["widget"], active_tab["manager"].get_pixmap())
+        self._refresh_widget(
+            active_tab["widget"], active_tab["manager"].get_tab_pixmap()
+        )
 
     def fit_to_container(self):
         """Resize the image while preserving aspect ratio."""
@@ -154,4 +164,6 @@ class TabManager:
             return
 
         active_tab["manager"].zoom_factor = 1.0
-        self._refresh_widget(active_tab["widget"], active_tab["manager"].get_pixmap())
+        self._refresh_widget(
+            active_tab["widget"], active_tab["manager"].get_tab_pixmap()
+        )

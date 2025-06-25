@@ -48,5 +48,5 @@ jobs:
       - name: Run linting
         run: pre-commit run --all-files
 
-      # - name: Run tests
-      #  run: pytest
+      - name: Run tests
+        run: pytest

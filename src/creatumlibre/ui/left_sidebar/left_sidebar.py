@@ -26,10 +26,10 @@ class LeftSidebar(QWidget):
 
         # Create and add tool buttons
         self.btn_color_adjustment = self._create_tool_button(
-            "src/assets/color.png", self.color_adjustment_dialog.show
+            "src/creatumlibre/assets/color.png", self.color_adjustment_dialog.show
         )
         self.btn_region = self._create_tool_button(
-            "src/assets/region.png",
+            "src/creatumlibre/assets/region.png",
             lambda: self.parent.ui_input_mode.set_mode(InputMode.SELECT_REGION),
         )
 

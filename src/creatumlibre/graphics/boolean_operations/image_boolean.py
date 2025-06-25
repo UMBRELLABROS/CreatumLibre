@@ -13,6 +13,8 @@ def merge(from_obj: ImageHandler, to_obj: ImageHandler):
 
     base = to_obj.get_image()
     h, w = overlay.shape[:2]
+    if h < 1 or w < 1:
+        return
     roi = base[y : y + h, x : x + w].astype(np.float32)
     overlay = overlay.astype(np.float32)
 
