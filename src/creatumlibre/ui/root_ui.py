@@ -11,6 +11,7 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
+from creatumlibre.ui.dialogs.dialog_manager import DialogManager
 from creatumlibre.ui.input.input_handler import InputHandler
 from creatumlibre.ui.left_sidebar.left_sidebar import LeftSidebar
 from creatumlibre.ui.manager.tab_manager import TabManager
@@ -20,10 +21,14 @@ from creatumlibre.ui.mode.ui_input_mode import UiMode
 
 
 class RootUi(QMainWindow):
+    """root class, container of the app"""
+
     def __init__(self):
         super().__init__()
 
         self.last_opened_folder = str(Path.home())
+
+        self.dialog_manager = DialogManager()
 
         self.setWindowTitle("CreatumLibre")
         self.setGeometry(100, 100, 1200, 800)

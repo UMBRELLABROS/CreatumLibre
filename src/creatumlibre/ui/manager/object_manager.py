@@ -5,6 +5,7 @@ from PyQt6.QtGui import QImage, QPixmap
 
 from creatumlibre.graphics.boolean_operations.image_boolean import merge
 from creatumlibre.ui.manager.image_handler import ImageHandler
+from creatumlibre.ui.mode.ui_input_mode import TransformMode
 
 
 class ObjectManager:
@@ -17,6 +18,12 @@ class ObjectManager:
 
         self._add_new_image_by_filename(file_path)
 
+    def get_active_object_index(self):
+        """be sure, the index is valid"""
+        if not self.object_list:
+            return None
+        return min(self.actual_object_index, len(self.object_list) - 1)
+
     def _add_new_image_by_filename(self, file_path):
         new_np_image = cv2.imread(file_path)
         image_instance = ImageHandler(new_np_image, (0, 0), False)
@@ -26,14 +33,21 @@ class ObjectManager:
         return self.object_list[0].get_image() if self.object_list else None
 
     def get_active_image(self):
-        return (
-            self.object_list[self.actual_object_index].get_image()
-            if self.object_list
-            else None
-        )
+        if (idx := self.get_active_object_index()) is None:
+            return None
+        return self.object_list[idx].get_image()
+
+    def get_promoted_object(self):
+        """get the promoted image by flag"""
+        for image_object in self.object_list:
+            if image_object.is_promoted:
+                return image_object
+        return None
 
     def get_active_object(self):
-        return self.object_list[self.actual_object_index] if self.object_list else None
+        if (idx := self.get_active_object_index()) is None:
+            return None
+        return self.object_list[idx]
 
     def get_base_object(self):
         return self.object_list[0] if self.object_list else None
@@ -47,19 +61,11 @@ class ObjectManager:
 
         for image_obj in self.object_list[1:]:
             overlay_obj = image_obj.copy()
-            if overlay_obj.is_promoted:
-                promoted_overlay_obj = overlay_obj.copy()
-                h, w = promoted_overlay_obj.get_image().shape[:2]
-                cv2.rectangle(
-                    promoted_overlay_obj.get_image(),
-                    (0, 0),
-                    (w - 1, h - 1),
-                    (255, 0, 255),
-                    thickness=int(1 / self.zoom_factor),
-                )
-                merge(promoted_overlay_obj, base_image)
-            else:
-                merge(overlay_obj, base_image)
+            if image_obj.is_promoted:
+                overlay_obj.draw_selection_frame(TransformMode.NONE, self.zoom_factor)
+            if image_obj.is_selected:
+                overlay_obj.draw_selection_frame(TransformMode.SCALE, self.zoom_factor)
+            merge(overlay_obj, base_image)
 
         return self._to_qpixmap(base_image.get_image())
 
@@ -73,12 +79,12 @@ class ObjectManager:
         )
         return QPixmap.fromImage(q_image)
 
-    def delete_object(self, index=None):
-        """Deletes object by index or active one."""
-        idx = self.actual_object_index if index is None else index
-        if 0 <= idx < len(self.object_list):
-            del self.object_list[idx]
-            self.actual_object_index = max(0, self.actual_object_index - 1)
+    def delete_object(self, image_object: ImageHandler):
+        """Deletes object from list by value"""
+        if image_object in self.object_list:
+            index = self.object_list.index(image_object)
+            self.object_list.remove(image_object)
+            self.actual_object_index = max(0, index - 1)
 
     def add_object(self, image_handler: ImageHandler, position: int | None = None):
         """Adds a new object at the specified index or end."""
@@ -91,7 +97,47 @@ class ObjectManager:
         if 0 <= index < len(self.object_list):
             self.actual_object_index = index
 
-    def get_pixmap(self) -> QPixmap:
+    def set_selected_object_by_click(self, position: tuple[int, int]) -> bool:
+        """scan all objects from top to bottom it is hit"""
+        for image_object in reversed(self.object_list[1:]):
+            if image_object.contains_point(position):
+                image_object.is_selected = True
+                image_object.position_before_drag = image_object.position
+                return True
+        return False
+
+    def update_selected_position(self, dx: int, dy: int):
+        """update all selected posiitons"""
+        for image_object in reversed(self.object_list[1:]):
+            if image_object.is_selected:
+                print(f"dx: {dx}, dy: {dy}")
+                image_object.set_position(
+                    (
+                        image_object.position_before_drag[0] + dx,
+                        image_object.position_before_drag[1] + dy,
+                    )
+                )
+
+    def clear_selection(self):
+        """release all selections i.e: by Esc"""
+        for image_object in reversed(self.object_list):
+            image_object.is_selected = False
+
+    def copy_promoted(self, is_cut: bool):
+        """create a new object from the promoted image
+        param is_cut: if is cut: erase the underlying image
+        """
+        new_object = self.get_promoted_object().copy()
+        self.add_object(new_object)
+        print(is_cut)
+
+    def delete_promoted(self):
+        """create a new object from the promoted image
+        param is_cut: if is cut: erase the underlying image
+        """
+        self.delete_object(self.get_promoted_object())
+
+    def get_tab_pixmap(self) -> QPixmap:
         """Convenience method for tab manager to retrieve full composition."""
         return self.show_resulting_image()
 

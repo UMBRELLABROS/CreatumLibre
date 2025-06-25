@@ -44,7 +44,7 @@ class UiMode:
         if event.key() == Qt.Key_Escape:
             self.reset_mode()
 
-        elif self.mode in (InputMode.SELECT_REGION, InputMode.MOVE_OBJECT):
+        elif self.mode in (InputMode.SELECT_REGION, InputMode.MOVE_OBJECTS):
             if event.mouseButton() == Qt.MouseButton.LeftButton:
                 if event.type() == QEvent.Type.MouseButtonPress:
                     self.set_mode(MOUSE_ACTION.START)
@@ -64,7 +64,7 @@ class InputMode(Enum):
     IDLE = 0
     SELECT_REGION = 1
     SELECT_POINT_CLOUD = 2
-    MOVE_OBJECT = 3
+    MOVE_OBJECTS = 3
 
 
 class MOUSE_ACTION(Enum):
@@ -72,3 +72,11 @@ class MOUSE_ACTION(Enum):
     START = 1  # mouse down
     DRAG = 2  # mouse move
     STOP = 3  # mouse up
+
+
+class TransformMode(Enum):
+    NONE = 0
+    SCALE = 1
+    ROTATE = 2
+    PERSPECTIVE = 3
+    TRANSLATE = 4

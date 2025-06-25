@@ -36,8 +36,8 @@ jobs:
         with:
           python-version: "3.13"
 
-      - name: Install Python dependencies
-        run: uv pip install --system .
+      - name: Install project and dependencies
+        run: uv pip install --system -e .
 
       - name: Install pylint and pre-commit manually
         run: uv pip install --system pylint pre-commit
@@ -48,5 +48,5 @@ jobs:
       - name: Run linting
         run: pre-commit run --all-files
 
-      # - name: Run tests
-      #  run: pytest
+      - name: Run tests
+        run: pytest
