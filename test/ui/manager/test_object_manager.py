@@ -40,7 +40,7 @@ def test_add_object_increases_list(manager, image_handler):
 def test_delete_object_removes_item(manager, image_handler):
     manager.add_object(image_handler)
     length_before = len(manager.object_list)
-    manager.delete_object()
+    manager.delete_object(image_handler)
     assert len(manager.object_list) == length_before - 1
 
 
