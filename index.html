@@ -36,6 +36,17 @@
   <h1>CreatumLibre — Module Index</h1>
   <h3>Vector Graphics and Photo Editor</h3>
   
+    <div class="path">src/creatumlibre/graphics/boolean_operations/image_boolean.py</div>
+    <div class="classname">
+      <a href="https://umbrellabros.github.io/CreatumLibre/creatumlibre/graphics/boolean_operations/image_boolean.html">XY</a>
+    </div>
+    <div class="docstring">2D vector class with basic operations.</div>
+    
+    <div class="methods">
+        from_tuple · to_tuple · add · sub · max_XY · min_XY
+    </div>
+    
+  
     <div class="path">src/creatumlibre/graphics/selection/region_manager.py</div>
     <div class="classname">
       <a href="https://umbrellabros.github.io/CreatumLibre/creatumlibre/graphics/selection/region_manager.html">RegionManager</a>
@@ -98,7 +109,7 @@
     <div class="docstring">Handles global key and mouse events.</div>
     
     <div class="methods">
-        map_event_to_image_coordinates · eventFilter · handle_mouse_press · handle_mouse_move · handle_mouse_release · create_new_image_object_from_selection · handle_key_press · process_rect_selection
+        map_event_to_image_coordinates · eventFilter · handle_mouse_press · handle_mouse_move · handle_mouse_release · create_new_image_object_from_selection · handle_key_press · process_rect_selection · set_clipboard · get_clipboard
     </div>
     
   
@@ -131,7 +142,7 @@
     <div class="docstring">Manages rectangular images (with optional masks) to produce one composited picture.</div>
     
     <div class="methods">
-        get_active_object_index · _add_new_image_by_filename · get_base_image · get_active_image · get_promoted_object · get_active_object · get_base_object · show_resulting_image · _to_qpixmap · delete_object · add_object · select_object · set_selected_object_by_click · update_selected_position · clear_selection · copy_promoted · delete_promoted · get_tab_pixmap · merge_selection
+        _add_new_image_by_filename · get_base_image · get_promoted_object · get_parent · get_base_object · show_resulting_image · _to_qpixmap · delete_object · add_object · set_selected_object_by_click · set_new_position · update_selected_position · clear_selection · clear_promoted · copy_promoted_to_clipboard · paste_clipboard · merge_selection
     </div>
     
   
