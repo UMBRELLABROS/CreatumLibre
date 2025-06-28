@@ -86,7 +86,7 @@ class TabManager:
 
         tab_pixmap = obj_ref[
             "manager"
-        ].get_tab_pixmap()  # Get final image with all objects/layers
+        ].show_resulting_image()  # Get final image with all objects/layers
         self._refresh_widget(widget=obj_ref["widget"], pixmap=tab_pixmap)
 
     def refresh_active_tab_display(self):
@@ -125,7 +125,7 @@ class TabManager:
             0.1, min(3.0, active_tab["manager"].zoom_factor * factor)
         )  # Prevent extreme zoom
         self._refresh_widget(
-            active_tab["widget"], active_tab["manager"].get_tab_pixmap()
+            active_tab["widget"], active_tab["manager"].show_resulting_image()
         )
 
     def fit_to_container(self):
@@ -165,5 +165,5 @@ class TabManager:
 
         active_tab["manager"].zoom_factor = 1.0
         self._refresh_widget(
-            active_tab["widget"], active_tab["manager"].get_tab_pixmap()
+            active_tab["widget"], active_tab["manager"].show_resulting_image()
         )

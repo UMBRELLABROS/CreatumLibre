@@ -1,6 +1,7 @@
 # pylint: disable=no-member
 
 import cv2
+from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QImage, QPixmap
 
 from creatumlibre.graphics.boolean_operations.image_boolean import merge
@@ -13,16 +14,9 @@ class ObjectManager:
 
     def __init__(self, file_path: str):
         self.object_list = []
-        self.actual_object_index = 0
         self.zoom_factor = 1.0
 
         self._add_new_image_by_filename(file_path)
-
-    def get_active_object_index(self):
-        """be sure, the index is valid"""
-        if not self.object_list:
-            return None
-        return min(self.actual_object_index, len(self.object_list) - 1)
 
     def _add_new_image_by_filename(self, file_path):
         new_np_image = cv2.imread(file_path)
@@ -32,11 +26,6 @@ class ObjectManager:
     def get_base_image(self):
         return self.object_list[0].get_image() if self.object_list else None
 
-    def get_active_image(self):
-        if (idx := self.get_active_object_index()) is None:
-            return None
-        return self.object_list[idx].get_image()
-
     def get_promoted_object(self):
         """get the promoted image by flag"""
         for image_object in self.object_list:
@@ -44,10 +33,12 @@ class ObjectManager:
                 return image_object
         return None
 
-    def get_active_object(self):
-        if (idx := self.get_active_object_index()) is None:
-            return None
-        return self.object_list[idx]
+    def get_parent(self):
+        """get the activated object or the base image"""
+        for image_object in self.object_list:
+            if image_object.is_selected:
+                return image_object
+        return self.get_base_object()
 
     def get_base_object(self):
         return self.object_list[0] if self.object_list else None
@@ -82,35 +73,46 @@ class ObjectManager:
     def delete_object(self, image_object: ImageHandler):
         """Deletes object from list by value"""
         if image_object in self.object_list:
-            index = self.object_list.index(image_object)
             self.object_list.remove(image_object)
-            self.actual_object_index = max(0, index - 1)
 
-    def add_object(self, image_handler: ImageHandler, position: int | None = None):
-        """Adds a new object at the specified index or end."""
-        insert_at = self.actual_object_index + 1 if position is None else position
-        self.object_list.insert(insert_at, image_handler)
-        self.actual_object_index = insert_at
+    def add_object(self, image_handler: ImageHandler):
+        """Adds a new object"""
+        self.object_list.append(image_handler)
 
-    def select_object(self, index: int):
-        """Sets the active object to manipulate."""
-        if 0 <= index < len(self.object_list):
-            self.actual_object_index = index
-
-    def set_selected_object_by_click(self, position: tuple[int, int]) -> bool:
+    def set_selected_object_by_click(self, position: tuple[int, int], modifiers):
         """scan all objects from top to bottom it is hit"""
+        count = 0
         for image_object in reversed(self.object_list[1:]):
-            if image_object.contains_point(position):
-                image_object.is_selected = True
+            if image_object.contains_point(position) and not image_object.is_promoted:
+                count += 1
                 image_object.position_before_drag = image_object.position
-                return True
-        return False
+                if (
+                    modifiers & Qt.KeyboardModifier.ControlModifier
+                    or modifiers & Qt.KeyboardModifier.MetaModifier
+                ):
+                    print("modifier: select")
+                    image_object.is_selected = not image_object.is_selected
+                else:
+                    print("single: select")
+                    self.clear_selection()
+                    image_object.is_selected = True
+        if count == 0:
+            self.clear_selection()
+
+    def set_new_position(self):
+        """new posiotn of the moved object"""
+        for image_object in reversed(self.object_list[1:]):
+            if image_object.is_selected:
+                image_object.position_before_drag = image_object.position
 
     def update_selected_position(self, dx: int, dy: int):
         """update all selected posiitons"""
+        selected_count = sum(obj.is_selected for obj in self.object_list[1:])
+        print(f"{selected_count} objects selected.")
+
         for image_object in reversed(self.object_list[1:]):
             if image_object.is_selected:
-                print(f"dx: {dx}, dy: {dy}")
+                # print(f"dx: {dx}, dy: {dy}")
                 image_object.set_position(
                     (
                         image_object.position_before_drag[0] + dx,
@@ -123,33 +125,32 @@ class ObjectManager:
         for image_object in reversed(self.object_list):
             image_object.is_selected = False
 
-    def copy_promoted(self, is_cut: bool):
+    def clear_promoted(self):
+        """release all promotions i.e: by Esc"""
+        for image_object in reversed(self.object_list):
+            if image_object.is_promoted:
+                self.delete_object(image_object)
+
+    def copy_promoted_to_clipboard(self, is_cut: bool) -> ImageHandler:
         """create a new object from the promoted image
         param is_cut: if is cut: erase the underlying image
         """
-        new_object = self.get_promoted_object().copy()
-        self.add_object(new_object)
-        print(is_cut)
+        print(f"Cut mode: {is_cut}")
+        if (promoted_object := self.get_promoted_object()) is not None:
+            return promoted_object.copy()
+        return None
 
-    def delete_promoted(self):
-        """create a new object from the promoted image
-        param is_cut: if is cut: erase the underlying image
-        """
-        self.delete_object(self.get_promoted_object())
-
-    def get_tab_pixmap(self) -> QPixmap:
-        """Convenience method for tab manager to retrieve full composition."""
-        return self.show_resulting_image()
+    def paste_clipboard(self, clipboard: ImageHandler):
+        """put clipboard image to object list"""
+        image_object = clipboard.copy()
+        image_object.is_selected = True
+        image_object.is_promoted = False
+        self.add_object(image_object)
 
     def merge_selection(self):
         """Finds the promoted object and merges it into the layer below."""
         # Find promoted ImageHandler
-        promoted = next(
-            (obj for obj in self.object_list if getattr(obj, "is_promoted", False)),
-            None,
-        )
-        if not promoted:
-            return
+        promoted = self.get_promoted_object()
 
         index = self.object_list.index(promoted)
         if index == 0:

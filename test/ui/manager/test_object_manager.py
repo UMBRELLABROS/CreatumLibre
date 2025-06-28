@@ -42,16 +42,3 @@ def test_delete_object_removes_item(manager, image_handler):
     length_before = len(manager.object_list)
     manager.delete_object(image_handler)
     assert len(manager.object_list) == length_before - 1
-
-
-def test_select_object_sets_index(manager, image_handler):
-    manager.add_object(image_handler)
-    manager.select_object(1)
-    assert manager.actual_object_index == 1
-
-
-def test_get_active_object_bounds(manager):
-    # Manually break it
-    manager.actual_object_index = 999
-    obj = manager.get_active_object()
-    assert obj is not None

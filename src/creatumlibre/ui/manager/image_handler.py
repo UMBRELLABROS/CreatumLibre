@@ -7,6 +7,12 @@ from PyQt6.QtGui import QImage, QPixmap
 from creatumlibre.graphics.selection.region_manager import RegionManager
 from creatumlibre.ui.mode.ui_input_mode import TransformMode
 
+color_dict = {
+    TransformMode.NONE: (0, 255, 255),
+    TransformMode.SCALE: (255, 0, 255),
+    TransformMode.MULTI_SCALE: (255, 0, 0),
+}
+
 
 class ImageHandler:
     """Handles a single image object: pixel data, selection, and position."""
@@ -94,7 +100,7 @@ class ImageHandler:
         h, w = img.shape[:2]
         if h < 4 or w < 4:
             return
-        color = (255, 0, 255)  # magenta
+        color = color_dict[transform_mode]
         thickness = int(1 / zoom_factor)
 
         # Draw border
