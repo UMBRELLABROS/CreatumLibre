@@ -28,29 +28,27 @@ class RootUi(QMainWindow):
 
         self.last_opened_folder = str(Path.home())
 
-        self.dialog_manager = DialogManager()
-
         self.setWindowTitle("CreatumLibre")
         self.setGeometry(100, 100, 1200, 800)
         self.setMinimumSize(1200, 800)
         self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         self.resize(1200, 800)
 
+        self.dialog_manager = DialogManager()
         self.ui_input_mode = UiMode("Base")
-        self.input_handler = InputHandler(self)
-        self.installEventFilter(self.input_handler)
 
         self.menu_bar = self.menuBar()
-        self.workspace_layout = QVBoxLayout()
         self.left_sidebar_layout = None
 
-        # Create Tab Widget
+        self.workspace_layout = QVBoxLayout()
         self.tab_manager = TabManager(self)
-
         self.init_layout()
 
         self.file_menu = FileMenu(self)  # Initialize File Menu
         self.zoom_menu = ZoomMenu(self)  # Initialize Zoom Menu
+
+        self.input_handler = InputHandler(self)
+        self.installEventFilter(self.input_handler)
 
         # debug
         test_file_path = (

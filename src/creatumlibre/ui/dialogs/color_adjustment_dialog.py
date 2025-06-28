@@ -152,9 +152,7 @@ class ColorAdjustmentDialog(QDialog):
                 manager.add_object(new_obj)
                 self.base_image_snapshot = new_obj.get_image().copy()
                 self.apply_all_adjustments()
-                self.tab_manager.refresh_tab_display(
-                    self.tab_manager.get_active_tab_index()
-                )
+                self.tab_manager.refresh_active_tab_display()
 
     def apply_all_adjustments(self):
         promoted = self.get_promoted_object()
@@ -172,7 +170,7 @@ class ColorAdjustmentDialog(QDialog):
 
         promoted.set_image(image)
 
-        self.tab_manager.refresh_tab_display(self.tab_manager.get_active_tab_index())
+        self.tab_manager.refresh_active_tab_display()
 
     def get_promoted_object(self):
         """Finds the promoted object in the current tab's object manager."""
@@ -192,7 +190,7 @@ class ColorAdjustmentDialog(QDialog):
     def apply_changes(self):
         obj_manager = self.tab_manager.get_active_tab().get("manager")
         obj_manager.merge_selection()
-        self.tab_manager.refresh_tab_display(self.tab_manager.get_active_tab_index())
+        self.tab_manager.refresh_active_tab_display()
         self.accept()
 
     def cancel_changes(self):
@@ -202,7 +200,5 @@ class ColorAdjustmentDialog(QDialog):
             active_tab = self.tab_manager.get_active_tab()
             object_manager = active_tab.get("manager")
             object_manager.object_list.remove(promoted)
-            self.tab_manager.refresh_tab_display(
-                self.tab_manager.get_active_tab_index()
-            )
+            self.tab_manager.refresh_active_tab_display()
             self.reject()

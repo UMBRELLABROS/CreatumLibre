@@ -1,3 +1,4 @@
+import inspect
 from enum import Enum
 
 from PyQt6.QtCore import QEvent, Qt
@@ -16,6 +17,7 @@ class UiMode:
 
     def set_mode(self, mode):
         """Set the UI mode."""
+        print("caller name:", inspect.stack()[1][3])
         self.mode = mode
         print(f"Active mode: {self.mode}")
 
@@ -80,3 +82,4 @@ class TransformMode(Enum):
     ROTATE = 2
     PERSPECTIVE = 3
     TRANSLATE = 4
+    MULTI_SCALE = 5
