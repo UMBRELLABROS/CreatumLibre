@@ -4,7 +4,7 @@ import cv2
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QImage, QPixmap
 
-from creatumlibre.graphics.boolean_operations.image_boolean import merge
+from creatumlibre.graphics.boolean_operations.image_boolean import Vector2D, merge
 from creatumlibre.ui.manager.image_handler import ImageHandler
 from creatumlibre.ui.mode.ui_input_mode import TransformMode
 
@@ -20,7 +20,7 @@ class ObjectManager:
 
     def _add_new_image_by_filename(self, file_path):
         new_np_image = cv2.imread(file_path)
-        image_instance = ImageHandler(new_np_image, (0, 0), False)
+        image_instance = ImageHandler(new_np_image, Vector2D(0, 0), False)
         self.object_list.append(image_instance)
 
     def get_base_image(self):
@@ -79,7 +79,14 @@ class ObjectManager:
         """Adds a new object"""
         self.object_list.append(image_handler)
 
-    def set_selected_object_by_click(self, position: tuple[int, int], modifiers):
+    def get_object_at(self, position: Vector2D):
+        """get image at clicked point"""
+        for image_object in reversed(self.object_list[1:]):
+            if image_object.contains_point(position) and not image_object.is_promoted:
+                return image_object
+        return None
+
+    def set_selected_object_by_click(self, position: Vector2D, modifiers):
         """scan all objects from top to bottom it is hit"""
         count = 0
         for image_object in reversed(self.object_list[1:]):
@@ -105,7 +112,7 @@ class ObjectManager:
             if image_object.is_selected:
                 image_object.position_before_drag = image_object.position
 
-    def update_selected_position(self, dx: int, dy: int):
+    def update_selected_position(self, delta: Vector2D):
         """update all selected posiitons"""
         selected_count = sum(obj.is_selected for obj in self.object_list[1:])
         print(f"{selected_count} objects selected.")
@@ -113,12 +120,9 @@ class ObjectManager:
         for image_object in reversed(self.object_list[1:]):
             if image_object.is_selected:
                 # print(f"dx: {dx}, dy: {dy}")
-                image_object.set_position(
-                    (
-                        image_object.position_before_drag[0] + dx,
-                        image_object.position_before_drag[1] + dy,
-                    )
-                )
+                print(image_object.position_before_drag.to_tuple())
+                print("------")
+                image_object.set_position(image_object.position_before_drag + delta)
 
     def clear_selection(self):
         """release all selections i.e: by Esc"""

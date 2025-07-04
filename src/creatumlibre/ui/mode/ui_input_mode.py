@@ -33,7 +33,7 @@ class UiMode:
             return (
                 self.init_key or "Control"
             )  #  Default to Control unless explicitly set
-        if self.mode == InputMode.SELECT_POINT_CLOUD:
+        if self.mode == InputMode.POINT_CLOUD:
             return self.init_key or "Shift"  #  Default to Shift for point clouds
         return None  #  Future modes can extend this logic
 
@@ -54,7 +54,7 @@ class UiMode:
                     self.set_mode(MOUSE_ACTION.DRAG)
                 elif event.type() == QEvent.Type.MouseButtonRelease:
                     self.set_mode(MOUSE_ACTION.STOP)
-        elif self.mode == InputMode.SELECT_POINT_CLOUD and event.key() == self.init_key:
+        elif self.mode == InputMode.POINT_CLOUD and event.key() == self.init_key:
             self.set_mode(InputMode.IDLE)
         elif self.key_action and event.key() == self.key_action:
             # Execute the action associated with the key
@@ -65,7 +65,7 @@ class UiMode:
 class InputMode(Enum):
     IDLE = 0
     SELECT_REGION = 1
-    SELECT_POINT_CLOUD = 2
+    POINT_CLOUD = 2
     MOVE_OBJECTS = 3
 
 
