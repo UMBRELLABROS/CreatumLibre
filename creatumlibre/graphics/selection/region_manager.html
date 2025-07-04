@@ -40,7 +40,16 @@
                                 <a class="variable" href="#RegionManager.bounding_rect">bounding_rect</a>
                         </li>
                         <li>
+                                <a class="variable" href="#RegionManager.point_list">point_list</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#RegionManager.copy">copy</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#RegionManager.set_mask_points">set_mask_points</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#RegionManager.get_mask_points">get_mask_points</a>
                         </li>
                         <li>
                                 <a class="function" href="#RegionManager.set_bounding_rect">set_bounding_rect</a>
@@ -86,51 +95,60 @@
 
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a>
-</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a>
-</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="k">class</span><span class="w"> </span><span class="nc">RegionManager</span><span class="p">:</span>
-</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Handles selection modifications, mask updates, and dynamic resizing.&quot;&quot;&quot;</span>
-</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a>
-</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Stores selection mask (0-255)</span>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">bounding_rect</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Stores current selection bounds</span>
-</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>
-</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>        <span class="n">new</span> <span class="o">=</span> <span class="n">RegionManager</span><span class="p">()</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>        <span class="n">new</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>        <span class="n">new</span><span class="o">.</span><span class="n">bounding_rect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounding_rect</span>
-</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>        <span class="k">return</span> <span class="n">new</span>
-</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>
-</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_bounding_rect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">height</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
-</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">bounding_rect</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">creatumlibre.graphics.math.vector2d</span><span class="w"> </span><span class="kn">import</span> <span class="n">Vector2D</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a>
+</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a>
+</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="k">class</span><span class="w"> </span><span class="nc">RegionManager</span><span class="p">:</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Handles selection modifications, mask updates, and dynamic resizing.&quot;&quot;&quot;</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Stores selection mask (0-255)</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">bounding_rect</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Stores current selection bounds</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">point_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Vector2D</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># stores the point cloud selection</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>
+</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>        <span class="n">new</span> <span class="o">=</span> <span class="n">RegionManager</span><span class="p">()</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>        <span class="n">new</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>        <span class="n">new</span><span class="o">.</span><span class="n">bounding_rect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounding_rect</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>        <span class="k">return</span> <span class="n">new</span>
 </span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>
-</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_bounding_rect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounding_rect</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_mask_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Vector2D</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">point_list</span> <span class="o">=</span> <span class="n">point_list</span>
 </span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>
-</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span>
+</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_mask_points</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Vector2D</span><span class="p">]:</span>
+</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">point_list</span>
 </span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a>
-</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">initialize_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_shape</span><span class="p">):</span>
-</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates an empty mask matching the image dimensions.</span>
-</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a><span class="sd">        0: transparent, 1: opaque (visible)</span>
-</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">image_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">image_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_bounding_rect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">height</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">bounding_rect</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a>
+</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_bounding_rect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounding_rect</span>
 </span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a>
-</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selection</span><span class="p">):</span>
-</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Updates the mask based on selection coordinates.&quot;&quot;&quot;</span>
-</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a>        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">selection</span><span class="o">.</span><span class="n">get_rect</span><span class="p">()</span>
-</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">[</span><span class="n">y</span> <span class="p">:</span> <span class="n">y</span> <span class="o">+</span> <span class="n">height</span><span class="p">,</span> <span class="n">x</span> <span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">width</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a>            <span class="mi">1</span>  <span class="c1"># Mark selection area as fully opaque</span>
-</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a>        <span class="p">)</span>
-</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a>
-</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a>        <span class="c1"># Update bounding rect</span>
-</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">bounding_rect</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
-</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a>
-</span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">apply_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
-</span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Applies the mask onto the image, modifying selection visibility.&quot;&quot;&quot;</span>
-</span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a>        <span class="n">masked_image</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-</span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a>        <span class="n">masked_image</span><span class="p">[</span><span class="n">mask</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>  <span class="c1"># Hide unselected regions</span>
-</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a>
-</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a>        <span class="k">return</span> <span class="n">masked_image</span>
+</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span>
+</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a>
+</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">initialize_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_shape</span><span class="p">):</span>
+</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates an empty mask matching the image dimensions.</span>
+</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a><span class="sd">        0: transparent, 1: opaque (visible)</span>
+</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">image_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">image_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a>
+</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selection</span><span class="p">):</span>
+</span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Updates the mask based on selection coordinates.&quot;&quot;&quot;</span>
+</span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a>        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">selection</span><span class="o">.</span><span class="n">get_rect</span><span class="p">()</span>
+</span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">[</span><span class="n">y</span> <span class="p">:</span> <span class="n">y</span> <span class="o">+</span> <span class="n">height</span><span class="p">,</span> <span class="n">x</span> <span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">width</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a>            <span class="mi">1</span>  <span class="c1"># Mark selection area as fully opaque</span>
+</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a>        <span class="p">)</span>
+</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a>
+</span><span id="L-48"><a href="#L-48"><span class="linenos">48</span></a>        <span class="c1"># Update bounding rect</span>
+</span><span id="L-49"><a href="#L-49"><span class="linenos">49</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">bounding_rect</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+</span><span id="L-50"><a href="#L-50"><span class="linenos">50</span></a>
+</span><span id="L-51"><a href="#L-51"><span class="linenos">51</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">apply_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
+</span><span id="L-52"><a href="#L-52"><span class="linenos">52</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Applies the mask onto the image, modifying selection visibility.&quot;&quot;&quot;</span>
+</span><span id="L-53"><a href="#L-53"><span class="linenos">53</span></a>        <span class="n">masked_image</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</span><span id="L-54"><a href="#L-54"><span class="linenos">54</span></a>        <span class="n">masked_image</span><span class="p">[</span><span class="n">mask</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>  <span class="c1"># Hide unselected regions</span>
+</span><span id="L-55"><a href="#L-55"><span class="linenos">55</span></a>
+</span><span id="L-56"><a href="#L-56"><span class="linenos">56</span></a>        <span class="k">return</span> <span class="n">masked_image</span>
 </span></pre></div>
 
 
@@ -146,50 +164,57 @@
 
     </div>
     <a class="headerlink" href="#RegionManager"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="RegionManager-5"><a href="#RegionManager-5"><span class="linenos"> 5</span></a><span class="k">class</span><span class="w"> </span><span class="nc">RegionManager</span><span class="p">:</span>
-</span><span id="RegionManager-6"><a href="#RegionManager-6"><span class="linenos"> 6</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Handles selection modifications, mask updates, and dynamic resizing.&quot;&quot;&quot;</span>
-</span><span id="RegionManager-7"><a href="#RegionManager-7"><span class="linenos"> 7</span></a>
-</span><span id="RegionManager-8"><a href="#RegionManager-8"><span class="linenos"> 8</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="RegionManager-9"><a href="#RegionManager-9"><span class="linenos"> 9</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Stores selection mask (0-255)</span>
-</span><span id="RegionManager-10"><a href="#RegionManager-10"><span class="linenos">10</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">bounding_rect</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Stores current selection bounds</span>
-</span><span id="RegionManager-11"><a href="#RegionManager-11"><span class="linenos">11</span></a>
-</span><span id="RegionManager-12"><a href="#RegionManager-12"><span class="linenos">12</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="RegionManager-13"><a href="#RegionManager-13"><span class="linenos">13</span></a>        <span class="n">new</span> <span class="o">=</span> <span class="n">RegionManager</span><span class="p">()</span>
-</span><span id="RegionManager-14"><a href="#RegionManager-14"><span class="linenos">14</span></a>        <span class="n">new</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-</span><span id="RegionManager-15"><a href="#RegionManager-15"><span class="linenos">15</span></a>        <span class="n">new</span><span class="o">.</span><span class="n">bounding_rect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounding_rect</span>
-</span><span id="RegionManager-16"><a href="#RegionManager-16"><span class="linenos">16</span></a>        <span class="k">return</span> <span class="n">new</span>
-</span><span id="RegionManager-17"><a href="#RegionManager-17"><span class="linenos">17</span></a>
-</span><span id="RegionManager-18"><a href="#RegionManager-18"><span class="linenos">18</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_bounding_rect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">height</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
-</span><span id="RegionManager-19"><a href="#RegionManager-19"><span class="linenos">19</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">bounding_rect</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="RegionManager-7"><a href="#RegionManager-7"><span class="linenos"> 7</span></a><span class="k">class</span><span class="w"> </span><span class="nc">RegionManager</span><span class="p">:</span>
+</span><span id="RegionManager-8"><a href="#RegionManager-8"><span class="linenos"> 8</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Handles selection modifications, mask updates, and dynamic resizing.&quot;&quot;&quot;</span>
+</span><span id="RegionManager-9"><a href="#RegionManager-9"><span class="linenos"> 9</span></a>
+</span><span id="RegionManager-10"><a href="#RegionManager-10"><span class="linenos">10</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="RegionManager-11"><a href="#RegionManager-11"><span class="linenos">11</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Stores selection mask (0-255)</span>
+</span><span id="RegionManager-12"><a href="#RegionManager-12"><span class="linenos">12</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">bounding_rect</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Stores current selection bounds</span>
+</span><span id="RegionManager-13"><a href="#RegionManager-13"><span class="linenos">13</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">point_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Vector2D</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># stores the point cloud selection</span>
+</span><span id="RegionManager-14"><a href="#RegionManager-14"><span class="linenos">14</span></a>
+</span><span id="RegionManager-15"><a href="#RegionManager-15"><span class="linenos">15</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="RegionManager-16"><a href="#RegionManager-16"><span class="linenos">16</span></a>        <span class="n">new</span> <span class="o">=</span> <span class="n">RegionManager</span><span class="p">()</span>
+</span><span id="RegionManager-17"><a href="#RegionManager-17"><span class="linenos">17</span></a>        <span class="n">new</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</span><span id="RegionManager-18"><a href="#RegionManager-18"><span class="linenos">18</span></a>        <span class="n">new</span><span class="o">.</span><span class="n">bounding_rect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounding_rect</span>
+</span><span id="RegionManager-19"><a href="#RegionManager-19"><span class="linenos">19</span></a>        <span class="k">return</span> <span class="n">new</span>
 </span><span id="RegionManager-20"><a href="#RegionManager-20"><span class="linenos">20</span></a>
-</span><span id="RegionManager-21"><a href="#RegionManager-21"><span class="linenos">21</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_bounding_rect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="RegionManager-22"><a href="#RegionManager-22"><span class="linenos">22</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounding_rect</span>
+</span><span id="RegionManager-21"><a href="#RegionManager-21"><span class="linenos">21</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_mask_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Vector2D</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+</span><span id="RegionManager-22"><a href="#RegionManager-22"><span class="linenos">22</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">point_list</span> <span class="o">=</span> <span class="n">point_list</span>
 </span><span id="RegionManager-23"><a href="#RegionManager-23"><span class="linenos">23</span></a>
-</span><span id="RegionManager-24"><a href="#RegionManager-24"><span class="linenos">24</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="RegionManager-25"><a href="#RegionManager-25"><span class="linenos">25</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span>
+</span><span id="RegionManager-24"><a href="#RegionManager-24"><span class="linenos">24</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_mask_points</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Vector2D</span><span class="p">]:</span>
+</span><span id="RegionManager-25"><a href="#RegionManager-25"><span class="linenos">25</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">point_list</span>
 </span><span id="RegionManager-26"><a href="#RegionManager-26"><span class="linenos">26</span></a>
-</span><span id="RegionManager-27"><a href="#RegionManager-27"><span class="linenos">27</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">initialize_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_shape</span><span class="p">):</span>
-</span><span id="RegionManager-28"><a href="#RegionManager-28"><span class="linenos">28</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates an empty mask matching the image dimensions.</span>
-</span><span id="RegionManager-29"><a href="#RegionManager-29"><span class="linenos">29</span></a><span class="sd">        0: transparent, 1: opaque (visible)</span>
-</span><span id="RegionManager-30"><a href="#RegionManager-30"><span class="linenos">30</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="RegionManager-31"><a href="#RegionManager-31"><span class="linenos">31</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">image_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">image_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+</span><span id="RegionManager-27"><a href="#RegionManager-27"><span class="linenos">27</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_bounding_rect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">height</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+</span><span id="RegionManager-28"><a href="#RegionManager-28"><span class="linenos">28</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">bounding_rect</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+</span><span id="RegionManager-29"><a href="#RegionManager-29"><span class="linenos">29</span></a>
+</span><span id="RegionManager-30"><a href="#RegionManager-30"><span class="linenos">30</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_bounding_rect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="RegionManager-31"><a href="#RegionManager-31"><span class="linenos">31</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounding_rect</span>
 </span><span id="RegionManager-32"><a href="#RegionManager-32"><span class="linenos">32</span></a>
-</span><span id="RegionManager-33"><a href="#RegionManager-33"><span class="linenos">33</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selection</span><span class="p">):</span>
-</span><span id="RegionManager-34"><a href="#RegionManager-34"><span class="linenos">34</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Updates the mask based on selection coordinates.&quot;&quot;&quot;</span>
-</span><span id="RegionManager-35"><a href="#RegionManager-35"><span class="linenos">35</span></a>        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">selection</span><span class="o">.</span><span class="n">get_rect</span><span class="p">()</span>
-</span><span id="RegionManager-36"><a href="#RegionManager-36"><span class="linenos">36</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">[</span><span class="n">y</span> <span class="p">:</span> <span class="n">y</span> <span class="o">+</span> <span class="n">height</span><span class="p">,</span> <span class="n">x</span> <span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">width</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-</span><span id="RegionManager-37"><a href="#RegionManager-37"><span class="linenos">37</span></a>            <span class="mi">1</span>  <span class="c1"># Mark selection area as fully opaque</span>
-</span><span id="RegionManager-38"><a href="#RegionManager-38"><span class="linenos">38</span></a>        <span class="p">)</span>
-</span><span id="RegionManager-39"><a href="#RegionManager-39"><span class="linenos">39</span></a>
-</span><span id="RegionManager-40"><a href="#RegionManager-40"><span class="linenos">40</span></a>        <span class="c1"># Update bounding rect</span>
-</span><span id="RegionManager-41"><a href="#RegionManager-41"><span class="linenos">41</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">bounding_rect</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
-</span><span id="RegionManager-42"><a href="#RegionManager-42"><span class="linenos">42</span></a>
-</span><span id="RegionManager-43"><a href="#RegionManager-43"><span class="linenos">43</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">apply_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
-</span><span id="RegionManager-44"><a href="#RegionManager-44"><span class="linenos">44</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Applies the mask onto the image, modifying selection visibility.&quot;&quot;&quot;</span>
-</span><span id="RegionManager-45"><a href="#RegionManager-45"><span class="linenos">45</span></a>        <span class="n">masked_image</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-</span><span id="RegionManager-46"><a href="#RegionManager-46"><span class="linenos">46</span></a>        <span class="n">masked_image</span><span class="p">[</span><span class="n">mask</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>  <span class="c1"># Hide unselected regions</span>
-</span><span id="RegionManager-47"><a href="#RegionManager-47"><span class="linenos">47</span></a>
-</span><span id="RegionManager-48"><a href="#RegionManager-48"><span class="linenos">48</span></a>        <span class="k">return</span> <span class="n">masked_image</span>
+</span><span id="RegionManager-33"><a href="#RegionManager-33"><span class="linenos">33</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="RegionManager-34"><a href="#RegionManager-34"><span class="linenos">34</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span>
+</span><span id="RegionManager-35"><a href="#RegionManager-35"><span class="linenos">35</span></a>
+</span><span id="RegionManager-36"><a href="#RegionManager-36"><span class="linenos">36</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">initialize_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_shape</span><span class="p">):</span>
+</span><span id="RegionManager-37"><a href="#RegionManager-37"><span class="linenos">37</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates an empty mask matching the image dimensions.</span>
+</span><span id="RegionManager-38"><a href="#RegionManager-38"><span class="linenos">38</span></a><span class="sd">        0: transparent, 1: opaque (visible)</span>
+</span><span id="RegionManager-39"><a href="#RegionManager-39"><span class="linenos">39</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="RegionManager-40"><a href="#RegionManager-40"><span class="linenos">40</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">image_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">image_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+</span><span id="RegionManager-41"><a href="#RegionManager-41"><span class="linenos">41</span></a>
+</span><span id="RegionManager-42"><a href="#RegionManager-42"><span class="linenos">42</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selection</span><span class="p">):</span>
+</span><span id="RegionManager-43"><a href="#RegionManager-43"><span class="linenos">43</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Updates the mask based on selection coordinates.&quot;&quot;&quot;</span>
+</span><span id="RegionManager-44"><a href="#RegionManager-44"><span class="linenos">44</span></a>        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">selection</span><span class="o">.</span><span class="n">get_rect</span><span class="p">()</span>
+</span><span id="RegionManager-45"><a href="#RegionManager-45"><span class="linenos">45</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">[</span><span class="n">y</span> <span class="p">:</span> <span class="n">y</span> <span class="o">+</span> <span class="n">height</span><span class="p">,</span> <span class="n">x</span> <span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">width</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="RegionManager-46"><a href="#RegionManager-46"><span class="linenos">46</span></a>            <span class="mi">1</span>  <span class="c1"># Mark selection area as fully opaque</span>
+</span><span id="RegionManager-47"><a href="#RegionManager-47"><span class="linenos">47</span></a>        <span class="p">)</span>
+</span><span id="RegionManager-48"><a href="#RegionManager-48"><span class="linenos">48</span></a>
+</span><span id="RegionManager-49"><a href="#RegionManager-49"><span class="linenos">49</span></a>        <span class="c1"># Update bounding rect</span>
+</span><span id="RegionManager-50"><a href="#RegionManager-50"><span class="linenos">50</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">bounding_rect</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+</span><span id="RegionManager-51"><a href="#RegionManager-51"><span class="linenos">51</span></a>
+</span><span id="RegionManager-52"><a href="#RegionManager-52"><span class="linenos">52</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">apply_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
+</span><span id="RegionManager-53"><a href="#RegionManager-53"><span class="linenos">53</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Applies the mask onto the image, modifying selection visibility.&quot;&quot;&quot;</span>
+</span><span id="RegionManager-54"><a href="#RegionManager-54"><span class="linenos">54</span></a>        <span class="n">masked_image</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</span><span id="RegionManager-55"><a href="#RegionManager-55"><span class="linenos">55</span></a>        <span class="n">masked_image</span><span class="p">[</span><span class="n">mask</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>  <span class="c1"># Hide unselected regions</span>
+</span><span id="RegionManager-56"><a href="#RegionManager-56"><span class="linenos">56</span></a>
+</span><span id="RegionManager-57"><a href="#RegionManager-57"><span class="linenos">57</span></a>        <span class="k">return</span> <span class="n">masked_image</span>
 </span></pre></div>
 
 
@@ -219,6 +244,17 @@
     
 
                             </div>
+                            <div id="RegionManager.point_list" class="classattr">
+                                <div class="attr variable">
+            <span class="name">point_list</span><span class="annotation">: list[creatumlibre.graphics.math.vector2d.Vector2D]</span>
+
+        
+    </div>
+    <a class="headerlink" href="#RegionManager.point_list"></a>
+    
+    
+
+                            </div>
                             <div id="RegionManager.copy" class="classattr">
                                         <input id="RegionManager.copy-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
@@ -230,11 +266,49 @@
 
     </div>
     <a class="headerlink" href="#RegionManager.copy"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="RegionManager.copy-12"><a href="#RegionManager.copy-12"><span class="linenos">12</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="RegionManager.copy-13"><a href="#RegionManager.copy-13"><span class="linenos">13</span></a>        <span class="n">new</span> <span class="o">=</span> <span class="n">RegionManager</span><span class="p">()</span>
-</span><span id="RegionManager.copy-14"><a href="#RegionManager.copy-14"><span class="linenos">14</span></a>        <span class="n">new</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-</span><span id="RegionManager.copy-15"><a href="#RegionManager.copy-15"><span class="linenos">15</span></a>        <span class="n">new</span><span class="o">.</span><span class="n">bounding_rect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounding_rect</span>
-</span><span id="RegionManager.copy-16"><a href="#RegionManager.copy-16"><span class="linenos">16</span></a>        <span class="k">return</span> <span class="n">new</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="RegionManager.copy-15"><a href="#RegionManager.copy-15"><span class="linenos">15</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="RegionManager.copy-16"><a href="#RegionManager.copy-16"><span class="linenos">16</span></a>        <span class="n">new</span> <span class="o">=</span> <span class="n">RegionManager</span><span class="p">()</span>
+</span><span id="RegionManager.copy-17"><a href="#RegionManager.copy-17"><span class="linenos">17</span></a>        <span class="n">new</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</span><span id="RegionManager.copy-18"><a href="#RegionManager.copy-18"><span class="linenos">18</span></a>        <span class="n">new</span><span class="o">.</span><span class="n">bounding_rect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounding_rect</span>
+</span><span id="RegionManager.copy-19"><a href="#RegionManager.copy-19"><span class="linenos">19</span></a>        <span class="k">return</span> <span class="n">new</span>
+</span></pre></div>
+
+
+    
+
+                            </div>
+                            <div id="RegionManager.set_mask_points" class="classattr">
+                                        <input id="RegionManager.set_mask_points-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">set_mask_points</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">point_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">creatumlibre</span><span class="o">.</span><span class="n">graphics</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">vector2d</span><span class="o">.</span><span class="n">Vector2D</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="RegionManager.set_mask_points-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#RegionManager.set_mask_points"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="RegionManager.set_mask_points-21"><a href="#RegionManager.set_mask_points-21"><span class="linenos">21</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_mask_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Vector2D</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+</span><span id="RegionManager.set_mask_points-22"><a href="#RegionManager.set_mask_points-22"><span class="linenos">22</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">point_list</span> <span class="o">=</span> <span class="n">point_list</span>
+</span></pre></div>
+
+
+    
+
+                            </div>
+                            <div id="RegionManager.get_mask_points" class="classattr">
+                                        <input id="RegionManager.get_mask_points-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">get_mask_points</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="nb">list</span><span class="p">[</span><span class="n">creatumlibre</span><span class="o">.</span><span class="n">graphics</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">vector2d</span><span class="o">.</span><span class="n">Vector2D</span><span class="p">]</span>:</span></span>
+
+                <label class="view-source-button" for="RegionManager.get_mask_points-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#RegionManager.get_mask_points"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="RegionManager.get_mask_points-24"><a href="#RegionManager.get_mask_points-24"><span class="linenos">24</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_mask_points</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Vector2D</span><span class="p">]:</span>
+</span><span id="RegionManager.get_mask_points-25"><a href="#RegionManager.get_mask_points-25"><span class="linenos">25</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">point_list</span>
 </span></pre></div>
 
 
@@ -252,8 +326,8 @@
 
     </div>
     <a class="headerlink" href="#RegionManager.set_bounding_rect"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="RegionManager.set_bounding_rect-18"><a href="#RegionManager.set_bounding_rect-18"><span class="linenos">18</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_bounding_rect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">height</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
-</span><span id="RegionManager.set_bounding_rect-19"><a href="#RegionManager.set_bounding_rect-19"><span class="linenos">19</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">bounding_rect</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="RegionManager.set_bounding_rect-27"><a href="#RegionManager.set_bounding_rect-27"><span class="linenos">27</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_bounding_rect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">height</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+</span><span id="RegionManager.set_bounding_rect-28"><a href="#RegionManager.set_bounding_rect-28"><span class="linenos">28</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">bounding_rect</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -271,8 +345,8 @@
 
     </div>
     <a class="headerlink" href="#RegionManager.get_bounding_rect"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="RegionManager.get_bounding_rect-21"><a href="#RegionManager.get_bounding_rect-21"><span class="linenos">21</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_bounding_rect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="RegionManager.get_bounding_rect-22"><a href="#RegionManager.get_bounding_rect-22"><span class="linenos">22</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounding_rect</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="RegionManager.get_bounding_rect-30"><a href="#RegionManager.get_bounding_rect-30"><span class="linenos">30</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_bounding_rect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="RegionManager.get_bounding_rect-31"><a href="#RegionManager.get_bounding_rect-31"><span class="linenos">31</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounding_rect</span>
 </span></pre></div>
 
 
@@ -290,8 +364,8 @@
 
     </div>
     <a class="headerlink" href="#RegionManager.get_mask"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="RegionManager.get_mask-24"><a href="#RegionManager.get_mask-24"><span class="linenos">24</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="RegionManager.get_mask-25"><a href="#RegionManager.get_mask-25"><span class="linenos">25</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="RegionManager.get_mask-33"><a href="#RegionManager.get_mask-33"><span class="linenos">33</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="RegionManager.get_mask-34"><a href="#RegionManager.get_mask-34"><span class="linenos">34</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span>
 </span></pre></div>
 
 
@@ -309,11 +383,11 @@
 
     </div>
     <a class="headerlink" href="#RegionManager.initialize_mask"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="RegionManager.initialize_mask-27"><a href="#RegionManager.initialize_mask-27"><span class="linenos">27</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">initialize_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_shape</span><span class="p">):</span>
-</span><span id="RegionManager.initialize_mask-28"><a href="#RegionManager.initialize_mask-28"><span class="linenos">28</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates an empty mask matching the image dimensions.</span>
-</span><span id="RegionManager.initialize_mask-29"><a href="#RegionManager.initialize_mask-29"><span class="linenos">29</span></a><span class="sd">        0: transparent, 1: opaque (visible)</span>
-</span><span id="RegionManager.initialize_mask-30"><a href="#RegionManager.initialize_mask-30"><span class="linenos">30</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="RegionManager.initialize_mask-31"><a href="#RegionManager.initialize_mask-31"><span class="linenos">31</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">image_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">image_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="RegionManager.initialize_mask-36"><a href="#RegionManager.initialize_mask-36"><span class="linenos">36</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">initialize_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_shape</span><span class="p">):</span>
+</span><span id="RegionManager.initialize_mask-37"><a href="#RegionManager.initialize_mask-37"><span class="linenos">37</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates an empty mask matching the image dimensions.</span>
+</span><span id="RegionManager.initialize_mask-38"><a href="#RegionManager.initialize_mask-38"><span class="linenos">38</span></a><span class="sd">        0: transparent, 1: opaque (visible)</span>
+</span><span id="RegionManager.initialize_mask-39"><a href="#RegionManager.initialize_mask-39"><span class="linenos">39</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="RegionManager.initialize_mask-40"><a href="#RegionManager.initialize_mask-40"><span class="linenos">40</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">image_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">image_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -334,15 +408,15 @@
 
     </div>
     <a class="headerlink" href="#RegionManager.update_mask"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="RegionManager.update_mask-33"><a href="#RegionManager.update_mask-33"><span class="linenos">33</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selection</span><span class="p">):</span>
-</span><span id="RegionManager.update_mask-34"><a href="#RegionManager.update_mask-34"><span class="linenos">34</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Updates the mask based on selection coordinates.&quot;&quot;&quot;</span>
-</span><span id="RegionManager.update_mask-35"><a href="#RegionManager.update_mask-35"><span class="linenos">35</span></a>        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">selection</span><span class="o">.</span><span class="n">get_rect</span><span class="p">()</span>
-</span><span id="RegionManager.update_mask-36"><a href="#RegionManager.update_mask-36"><span class="linenos">36</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">[</span><span class="n">y</span> <span class="p">:</span> <span class="n">y</span> <span class="o">+</span> <span class="n">height</span><span class="p">,</span> <span class="n">x</span> <span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">width</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-</span><span id="RegionManager.update_mask-37"><a href="#RegionManager.update_mask-37"><span class="linenos">37</span></a>            <span class="mi">1</span>  <span class="c1"># Mark selection area as fully opaque</span>
-</span><span id="RegionManager.update_mask-38"><a href="#RegionManager.update_mask-38"><span class="linenos">38</span></a>        <span class="p">)</span>
-</span><span id="RegionManager.update_mask-39"><a href="#RegionManager.update_mask-39"><span class="linenos">39</span></a>
-</span><span id="RegionManager.update_mask-40"><a href="#RegionManager.update_mask-40"><span class="linenos">40</span></a>        <span class="c1"># Update bounding rect</span>
-</span><span id="RegionManager.update_mask-41"><a href="#RegionManager.update_mask-41"><span class="linenos">41</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">bounding_rect</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="RegionManager.update_mask-42"><a href="#RegionManager.update_mask-42"><span class="linenos">42</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selection</span><span class="p">):</span>
+</span><span id="RegionManager.update_mask-43"><a href="#RegionManager.update_mask-43"><span class="linenos">43</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Updates the mask based on selection coordinates.&quot;&quot;&quot;</span>
+</span><span id="RegionManager.update_mask-44"><a href="#RegionManager.update_mask-44"><span class="linenos">44</span></a>        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">selection</span><span class="o">.</span><span class="n">get_rect</span><span class="p">()</span>
+</span><span id="RegionManager.update_mask-45"><a href="#RegionManager.update_mask-45"><span class="linenos">45</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">[</span><span class="n">y</span> <span class="p">:</span> <span class="n">y</span> <span class="o">+</span> <span class="n">height</span><span class="p">,</span> <span class="n">x</span> <span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">width</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="RegionManager.update_mask-46"><a href="#RegionManager.update_mask-46"><span class="linenos">46</span></a>            <span class="mi">1</span>  <span class="c1"># Mark selection area as fully opaque</span>
+</span><span id="RegionManager.update_mask-47"><a href="#RegionManager.update_mask-47"><span class="linenos">47</span></a>        <span class="p">)</span>
+</span><span id="RegionManager.update_mask-48"><a href="#RegionManager.update_mask-48"><span class="linenos">48</span></a>
+</span><span id="RegionManager.update_mask-49"><a href="#RegionManager.update_mask-49"><span class="linenos">49</span></a>        <span class="c1"># Update bounding rect</span>
+</span><span id="RegionManager.update_mask-50"><a href="#RegionManager.update_mask-50"><span class="linenos">50</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">bounding_rect</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -362,12 +436,12 @@
 
     </div>
     <a class="headerlink" href="#RegionManager.apply_mask"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="RegionManager.apply_mask-43"><a href="#RegionManager.apply_mask-43"><span class="linenos">43</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">apply_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
-</span><span id="RegionManager.apply_mask-44"><a href="#RegionManager.apply_mask-44"><span class="linenos">44</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Applies the mask onto the image, modifying selection visibility.&quot;&quot;&quot;</span>
-</span><span id="RegionManager.apply_mask-45"><a href="#RegionManager.apply_mask-45"><span class="linenos">45</span></a>        <span class="n">masked_image</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-</span><span id="RegionManager.apply_mask-46"><a href="#RegionManager.apply_mask-46"><span class="linenos">46</span></a>        <span class="n">masked_image</span><span class="p">[</span><span class="n">mask</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>  <span class="c1"># Hide unselected regions</span>
-</span><span id="RegionManager.apply_mask-47"><a href="#RegionManager.apply_mask-47"><span class="linenos">47</span></a>
-</span><span id="RegionManager.apply_mask-48"><a href="#RegionManager.apply_mask-48"><span class="linenos">48</span></a>        <span class="k">return</span> <span class="n">masked_image</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="RegionManager.apply_mask-52"><a href="#RegionManager.apply_mask-52"><span class="linenos">52</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">apply_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
+</span><span id="RegionManager.apply_mask-53"><a href="#RegionManager.apply_mask-53"><span class="linenos">53</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Applies the mask onto the image, modifying selection visibility.&quot;&quot;&quot;</span>
+</span><span id="RegionManager.apply_mask-54"><a href="#RegionManager.apply_mask-54"><span class="linenos">54</span></a>        <span class="n">masked_image</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</span><span id="RegionManager.apply_mask-55"><a href="#RegionManager.apply_mask-55"><span class="linenos">55</span></a>        <span class="n">masked_image</span><span class="p">[</span><span class="n">mask</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>  <span class="c1"># Hide unselected regions</span>
+</span><span id="RegionManager.apply_mask-56"><a href="#RegionManager.apply_mask-56"><span class="linenos">56</span></a>
+</span><span id="RegionManager.apply_mask-57"><a href="#RegionManager.apply_mask-57"><span class="linenos">57</span></a>        <span class="k">return</span> <span class="n">masked_image</span>
 </span></pre></div>
 
 

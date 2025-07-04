@@ -34,13 +34,7 @@
                     <a class="class" href="#DialogManager">DialogManager</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#DialogManager.dialog_list">dialog_list</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#DialogManager.add_dialog">add_dialog</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#DialogManager.remove_dialog">remove_dialog</a>
+                                <a class="variable" href="#DialogManager.dialogs">dialogs</a>
                         </li>
                         <li>
                                 <a class="function" href="#DialogManager.show">show</a>
@@ -50,6 +44,9 @@
                         </li>
                         <li>
                                 <a class="function" href="#DialogManager.update">update</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#DialogManager.remove">remove</a>
                         </li>
                 </ul>
 
@@ -79,43 +76,40 @@
 </span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a>
 </span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a>
 </span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="k">class</span><span class="w"> </span><span class="nc">DialogManager</span><span class="p">:</span>
-</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;handle the open dialogs&quot;&quot;&quot;</span>
+</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Handles all sorts of non-modal dialogs&quot;&quot;&quot;</span>
 </span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a>
 </span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">dialog_list</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">dialogs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">type</span><span class="p">,</span> <span class="n">QDialog</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 </span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>
-</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">add_dialog</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dialog</span><span class="p">:</span> <span class="n">QDialog</span><span class="p">):</span>
-</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;add a dialog so, it keeps showing&quot;&quot;&quot;</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">dialog_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dialog</span><span class="p">)</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>
-</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">remove_dialog</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dialog</span><span class="p">:</span> <span class="n">QDialog</span><span class="p">):</span>
-</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;remove the doalog from the open list&quot;&quot;&quot;</span>
-</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">dialog_list</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">dialog</span><span class="p">)</span>
-</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>
-</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dialog</span><span class="p">:</span> <span class="n">QDialog</span><span class="p">):</span>
-</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;show or raise modeless, depending on already open&quot;&quot;&quot;</span>
-</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>        <span class="k">if</span> <span class="n">dialog</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialog_list</span><span class="p">:</span>
-</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">add_dialog</span><span class="p">(</span><span class="n">dialog</span><span class="p">)</span>
-</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>            <span class="n">dialog</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>        <span class="k">else</span><span class="p">:</span>
-</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>            <span class="n">dialog</span><span class="o">.</span><span class="n">raise_</span><span class="p">()</span>
-</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a>            <span class="n">dialog</span><span class="o">.</span><span class="n">activateWindow</span><span class="p">()</span>
-</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>
-</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">exec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dialog</span><span class="p">:</span> <span class="n">QDialog</span><span class="p">):</span>
-</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Executes the dialog modally if not already shown.&quot;&quot;&quot;</span>
-</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a>        <span class="k">if</span> <span class="n">dialog</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialog_list</span><span class="p">:</span>
-</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">add_dialog</span><span class="p">(</span><span class="n">dialog</span><span class="p">)</span>
-</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a>            <span class="n">dialog</span><span class="o">.</span><span class="n">exec</span><span class="p">()</span>
-</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a>        <span class="k">else</span><span class="p">:</span>
-</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a>            <span class="n">dialog</span><span class="o">.</span><span class="n">raise_</span><span class="p">()</span>
-</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a>            <span class="n">dialog</span><span class="o">.</span><span class="n">activateWindow</span><span class="p">()</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dialog</span><span class="p">:</span> <span class="n">QDialog</span><span class="p">):</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>        <span class="n">dialog_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">dialog</span><span class="p">)</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>        <span class="k">if</span> <span class="n">dialog_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialogs</span><span class="p">:</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">dialogs</span><span class="p">[</span><span class="n">dialog_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">dialog</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>            <span class="n">dialog</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>            <span class="n">existing</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialogs</span><span class="p">[</span><span class="n">dialog_type</span><span class="p">]</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>            <span class="n">existing</span><span class="o">.</span><span class="n">raise_</span><span class="p">()</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>            <span class="n">existing</span><span class="o">.</span><span class="n">activateWindow</span><span class="p">()</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>
+</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">exec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dialog</span><span class="p">:</span> <span class="n">QDialog</span><span class="p">):</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>        <span class="n">dialog_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">dialog</span><span class="p">)</span>
+</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>        <span class="k">if</span> <span class="n">dialog_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialogs</span><span class="p">:</span>
+</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">dialogs</span><span class="p">[</span><span class="n">dialog_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">dialog</span>
+</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>            <span class="n">dialog</span><span class="o">.</span><span class="n">exec</span><span class="p">()</span>
+</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>            <span class="n">existing</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialogs</span><span class="p">[</span><span class="n">dialog_type</span><span class="p">]</span>
+</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a>            <span class="n">existing</span><span class="o">.</span><span class="n">raise_</span><span class="p">()</span>
+</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a>            <span class="n">existing</span><span class="o">.</span><span class="n">activateWindow</span><span class="p">()</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a>
+</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dialog_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">):</span>
+</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a>        <span class="k">if</span> <span class="n">dialog_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialogs</span><span class="p">:</span>
+</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a>            <span class="n">dialog</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialogs</span><span class="p">[</span><span class="n">dialog_type</span><span class="p">]</span>
+</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a>            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dialog</span><span class="p">,</span> <span class="s2">&quot;refresh&quot;</span><span class="p">):</span>
+</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a>                <span class="n">dialog</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span>
 </span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a>
-</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dialog_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">):</span>
-</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;update the selcted dialog&quot;&quot;&quot;</span>
-</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a>        <span class="k">for</span> <span class="n">dialog</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialog_list</span><span class="p">:</span>
-</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a>            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dialog</span><span class="p">,</span> <span class="n">dialog_type</span><span class="p">):</span>
-</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a>                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dialog</span><span class="p">,</span> <span class="s2">&quot;refresh&quot;</span><span class="p">):</span>
-</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a>                    <span class="n">dialog</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span>
+</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dialog_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">):</span>
+</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a>        <span class="k">if</span> <span class="n">dialog_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialogs</span><span class="p">:</span>
+</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a>            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialogs</span><span class="p">[</span><span class="n">dialog_type</span><span class="p">]</span>
 </span></pre></div>
 
 
@@ -132,103 +126,56 @@
     </div>
     <a class="headerlink" href="#DialogManager"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DialogManager-5"><a href="#DialogManager-5"><span class="linenos"> 5</span></a><span class="k">class</span><span class="w"> </span><span class="nc">DialogManager</span><span class="p">:</span>
-</span><span id="DialogManager-6"><a href="#DialogManager-6"><span class="linenos"> 6</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;handle the open dialogs&quot;&quot;&quot;</span>
+</span><span id="DialogManager-6"><a href="#DialogManager-6"><span class="linenos"> 6</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Handles all sorts of non-modal dialogs&quot;&quot;&quot;</span>
 </span><span id="DialogManager-7"><a href="#DialogManager-7"><span class="linenos"> 7</span></a>
 </span><span id="DialogManager-8"><a href="#DialogManager-8"><span class="linenos"> 8</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="DialogManager-9"><a href="#DialogManager-9"><span class="linenos"> 9</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">dialog_list</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="DialogManager-9"><a href="#DialogManager-9"><span class="linenos"> 9</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">dialogs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">type</span><span class="p">,</span> <span class="n">QDialog</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 </span><span id="DialogManager-10"><a href="#DialogManager-10"><span class="linenos">10</span></a>
-</span><span id="DialogManager-11"><a href="#DialogManager-11"><span class="linenos">11</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">add_dialog</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dialog</span><span class="p">:</span> <span class="n">QDialog</span><span class="p">):</span>
-</span><span id="DialogManager-12"><a href="#DialogManager-12"><span class="linenos">12</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;add a dialog so, it keeps showing&quot;&quot;&quot;</span>
-</span><span id="DialogManager-13"><a href="#DialogManager-13"><span class="linenos">13</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">dialog_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dialog</span><span class="p">)</span>
-</span><span id="DialogManager-14"><a href="#DialogManager-14"><span class="linenos">14</span></a>
-</span><span id="DialogManager-15"><a href="#DialogManager-15"><span class="linenos">15</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">remove_dialog</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dialog</span><span class="p">:</span> <span class="n">QDialog</span><span class="p">):</span>
-</span><span id="DialogManager-16"><a href="#DialogManager-16"><span class="linenos">16</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;remove the doalog from the open list&quot;&quot;&quot;</span>
-</span><span id="DialogManager-17"><a href="#DialogManager-17"><span class="linenos">17</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">dialog_list</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">dialog</span><span class="p">)</span>
-</span><span id="DialogManager-18"><a href="#DialogManager-18"><span class="linenos">18</span></a>
-</span><span id="DialogManager-19"><a href="#DialogManager-19"><span class="linenos">19</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dialog</span><span class="p">:</span> <span class="n">QDialog</span><span class="p">):</span>
-</span><span id="DialogManager-20"><a href="#DialogManager-20"><span class="linenos">20</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;show or raise modeless, depending on already open&quot;&quot;&quot;</span>
-</span><span id="DialogManager-21"><a href="#DialogManager-21"><span class="linenos">21</span></a>        <span class="k">if</span> <span class="n">dialog</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialog_list</span><span class="p">:</span>
-</span><span id="DialogManager-22"><a href="#DialogManager-22"><span class="linenos">22</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">add_dialog</span><span class="p">(</span><span class="n">dialog</span><span class="p">)</span>
-</span><span id="DialogManager-23"><a href="#DialogManager-23"><span class="linenos">23</span></a>            <span class="n">dialog</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</span><span id="DialogManager-24"><a href="#DialogManager-24"><span class="linenos">24</span></a>        <span class="k">else</span><span class="p">:</span>
-</span><span id="DialogManager-25"><a href="#DialogManager-25"><span class="linenos">25</span></a>            <span class="n">dialog</span><span class="o">.</span><span class="n">raise_</span><span class="p">()</span>
-</span><span id="DialogManager-26"><a href="#DialogManager-26"><span class="linenos">26</span></a>            <span class="n">dialog</span><span class="o">.</span><span class="n">activateWindow</span><span class="p">()</span>
-</span><span id="DialogManager-27"><a href="#DialogManager-27"><span class="linenos">27</span></a>
-</span><span id="DialogManager-28"><a href="#DialogManager-28"><span class="linenos">28</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">exec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dialog</span><span class="p">:</span> <span class="n">QDialog</span><span class="p">):</span>
-</span><span id="DialogManager-29"><a href="#DialogManager-29"><span class="linenos">29</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Executes the dialog modally if not already shown.&quot;&quot;&quot;</span>
-</span><span id="DialogManager-30"><a href="#DialogManager-30"><span class="linenos">30</span></a>        <span class="k">if</span> <span class="n">dialog</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialog_list</span><span class="p">:</span>
-</span><span id="DialogManager-31"><a href="#DialogManager-31"><span class="linenos">31</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">add_dialog</span><span class="p">(</span><span class="n">dialog</span><span class="p">)</span>
-</span><span id="DialogManager-32"><a href="#DialogManager-32"><span class="linenos">32</span></a>            <span class="n">dialog</span><span class="o">.</span><span class="n">exec</span><span class="p">()</span>
-</span><span id="DialogManager-33"><a href="#DialogManager-33"><span class="linenos">33</span></a>        <span class="k">else</span><span class="p">:</span>
-</span><span id="DialogManager-34"><a href="#DialogManager-34"><span class="linenos">34</span></a>            <span class="n">dialog</span><span class="o">.</span><span class="n">raise_</span><span class="p">()</span>
-</span><span id="DialogManager-35"><a href="#DialogManager-35"><span class="linenos">35</span></a>            <span class="n">dialog</span><span class="o">.</span><span class="n">activateWindow</span><span class="p">()</span>
+</span><span id="DialogManager-11"><a href="#DialogManager-11"><span class="linenos">11</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dialog</span><span class="p">:</span> <span class="n">QDialog</span><span class="p">):</span>
+</span><span id="DialogManager-12"><a href="#DialogManager-12"><span class="linenos">12</span></a>        <span class="n">dialog_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">dialog</span><span class="p">)</span>
+</span><span id="DialogManager-13"><a href="#DialogManager-13"><span class="linenos">13</span></a>        <span class="k">if</span> <span class="n">dialog_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialogs</span><span class="p">:</span>
+</span><span id="DialogManager-14"><a href="#DialogManager-14"><span class="linenos">14</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">dialogs</span><span class="p">[</span><span class="n">dialog_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">dialog</span>
+</span><span id="DialogManager-15"><a href="#DialogManager-15"><span class="linenos">15</span></a>            <span class="n">dialog</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</span><span id="DialogManager-16"><a href="#DialogManager-16"><span class="linenos">16</span></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="DialogManager-17"><a href="#DialogManager-17"><span class="linenos">17</span></a>            <span class="n">existing</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialogs</span><span class="p">[</span><span class="n">dialog_type</span><span class="p">]</span>
+</span><span id="DialogManager-18"><a href="#DialogManager-18"><span class="linenos">18</span></a>            <span class="n">existing</span><span class="o">.</span><span class="n">raise_</span><span class="p">()</span>
+</span><span id="DialogManager-19"><a href="#DialogManager-19"><span class="linenos">19</span></a>            <span class="n">existing</span><span class="o">.</span><span class="n">activateWindow</span><span class="p">()</span>
+</span><span id="DialogManager-20"><a href="#DialogManager-20"><span class="linenos">20</span></a>
+</span><span id="DialogManager-21"><a href="#DialogManager-21"><span class="linenos">21</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">exec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dialog</span><span class="p">:</span> <span class="n">QDialog</span><span class="p">):</span>
+</span><span id="DialogManager-22"><a href="#DialogManager-22"><span class="linenos">22</span></a>        <span class="n">dialog_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">dialog</span><span class="p">)</span>
+</span><span id="DialogManager-23"><a href="#DialogManager-23"><span class="linenos">23</span></a>        <span class="k">if</span> <span class="n">dialog_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialogs</span><span class="p">:</span>
+</span><span id="DialogManager-24"><a href="#DialogManager-24"><span class="linenos">24</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">dialogs</span><span class="p">[</span><span class="n">dialog_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">dialog</span>
+</span><span id="DialogManager-25"><a href="#DialogManager-25"><span class="linenos">25</span></a>            <span class="n">dialog</span><span class="o">.</span><span class="n">exec</span><span class="p">()</span>
+</span><span id="DialogManager-26"><a href="#DialogManager-26"><span class="linenos">26</span></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="DialogManager-27"><a href="#DialogManager-27"><span class="linenos">27</span></a>            <span class="n">existing</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialogs</span><span class="p">[</span><span class="n">dialog_type</span><span class="p">]</span>
+</span><span id="DialogManager-28"><a href="#DialogManager-28"><span class="linenos">28</span></a>            <span class="n">existing</span><span class="o">.</span><span class="n">raise_</span><span class="p">()</span>
+</span><span id="DialogManager-29"><a href="#DialogManager-29"><span class="linenos">29</span></a>            <span class="n">existing</span><span class="o">.</span><span class="n">activateWindow</span><span class="p">()</span>
+</span><span id="DialogManager-30"><a href="#DialogManager-30"><span class="linenos">30</span></a>
+</span><span id="DialogManager-31"><a href="#DialogManager-31"><span class="linenos">31</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dialog_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">):</span>
+</span><span id="DialogManager-32"><a href="#DialogManager-32"><span class="linenos">32</span></a>        <span class="k">if</span> <span class="n">dialog_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialogs</span><span class="p">:</span>
+</span><span id="DialogManager-33"><a href="#DialogManager-33"><span class="linenos">33</span></a>            <span class="n">dialog</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialogs</span><span class="p">[</span><span class="n">dialog_type</span><span class="p">]</span>
+</span><span id="DialogManager-34"><a href="#DialogManager-34"><span class="linenos">34</span></a>            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dialog</span><span class="p">,</span> <span class="s2">&quot;refresh&quot;</span><span class="p">):</span>
+</span><span id="DialogManager-35"><a href="#DialogManager-35"><span class="linenos">35</span></a>                <span class="n">dialog</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span>
 </span><span id="DialogManager-36"><a href="#DialogManager-36"><span class="linenos">36</span></a>
-</span><span id="DialogManager-37"><a href="#DialogManager-37"><span class="linenos">37</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dialog_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">):</span>
-</span><span id="DialogManager-38"><a href="#DialogManager-38"><span class="linenos">38</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;update the selcted dialog&quot;&quot;&quot;</span>
-</span><span id="DialogManager-39"><a href="#DialogManager-39"><span class="linenos">39</span></a>        <span class="k">for</span> <span class="n">dialog</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialog_list</span><span class="p">:</span>
-</span><span id="DialogManager-40"><a href="#DialogManager-40"><span class="linenos">40</span></a>            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dialog</span><span class="p">,</span> <span class="n">dialog_type</span><span class="p">):</span>
-</span><span id="DialogManager-41"><a href="#DialogManager-41"><span class="linenos">41</span></a>                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dialog</span><span class="p">,</span> <span class="s2">&quot;refresh&quot;</span><span class="p">):</span>
-</span><span id="DialogManager-42"><a href="#DialogManager-42"><span class="linenos">42</span></a>                    <span class="n">dialog</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span>
+</span><span id="DialogManager-37"><a href="#DialogManager-37"><span class="linenos">37</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dialog_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">):</span>
+</span><span id="DialogManager-38"><a href="#DialogManager-38"><span class="linenos">38</span></a>        <span class="k">if</span> <span class="n">dialog_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialogs</span><span class="p">:</span>
+</span><span id="DialogManager-39"><a href="#DialogManager-39"><span class="linenos">39</span></a>            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialogs</span><span class="p">[</span><span class="n">dialog_type</span><span class="p">]</span>
 </span></pre></div>
 
 
-            <div class="docstring"><p>handle the open dialogs</p>
+            <div class="docstring"><p>Handles all sorts of non-modal dialogs</p>
 </div>
 
 
-                            <div id="DialogManager.dialog_list" class="classattr">
+                            <div id="DialogManager.dialogs" class="classattr">
                                 <div class="attr variable">
-            <span class="name">dialog_list</span>
+            <span class="name">dialogs</span><span class="annotation">: dict[type, PyQt6.QtWidgets.QDialog]</span>
 
         
     </div>
-    <a class="headerlink" href="#DialogManager.dialog_list"></a>
+    <a class="headerlink" href="#DialogManager.dialogs"></a>
     
     
-
-                            </div>
-                            <div id="DialogManager.add_dialog" class="classattr">
-                                        <input id="DialogManager.add_dialog-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">add_dialog</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">dialog</span><span class="p">:</span> <span class="n">PyQt6</span><span class="o">.</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QDialog</span></span><span class="return-annotation">):</span></span>
-
-                <label class="view-source-button" for="DialogManager.add_dialog-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#DialogManager.add_dialog"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DialogManager.add_dialog-11"><a href="#DialogManager.add_dialog-11"><span class="linenos">11</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">add_dialog</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dialog</span><span class="p">:</span> <span class="n">QDialog</span><span class="p">):</span>
-</span><span id="DialogManager.add_dialog-12"><a href="#DialogManager.add_dialog-12"><span class="linenos">12</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;add a dialog so, it keeps showing&quot;&quot;&quot;</span>
-</span><span id="DialogManager.add_dialog-13"><a href="#DialogManager.add_dialog-13"><span class="linenos">13</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">dialog_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dialog</span><span class="p">)</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>add a dialog so, it keeps showing</p>
-</div>
-
-
-                            </div>
-                            <div id="DialogManager.remove_dialog" class="classattr">
-                                        <input id="DialogManager.remove_dialog-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">remove_dialog</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">dialog</span><span class="p">:</span> <span class="n">PyQt6</span><span class="o">.</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QDialog</span></span><span class="return-annotation">):</span></span>
-
-                <label class="view-source-button" for="DialogManager.remove_dialog-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#DialogManager.remove_dialog"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DialogManager.remove_dialog-15"><a href="#DialogManager.remove_dialog-15"><span class="linenos">15</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">remove_dialog</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dialog</span><span class="p">:</span> <span class="n">QDialog</span><span class="p">):</span>
-</span><span id="DialogManager.remove_dialog-16"><a href="#DialogManager.remove_dialog-16"><span class="linenos">16</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;remove the doalog from the open list&quot;&quot;&quot;</span>
-</span><span id="DialogManager.remove_dialog-17"><a href="#DialogManager.remove_dialog-17"><span class="linenos">17</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">dialog_list</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">dialog</span><span class="p">)</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>remove the doalog from the open list</p>
-</div>
-
 
                             </div>
                             <div id="DialogManager.show" class="classattr">
@@ -242,20 +189,19 @@
 
     </div>
     <a class="headerlink" href="#DialogManager.show"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DialogManager.show-19"><a href="#DialogManager.show-19"><span class="linenos">19</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dialog</span><span class="p">:</span> <span class="n">QDialog</span><span class="p">):</span>
-</span><span id="DialogManager.show-20"><a href="#DialogManager.show-20"><span class="linenos">20</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;show or raise modeless, depending on already open&quot;&quot;&quot;</span>
-</span><span id="DialogManager.show-21"><a href="#DialogManager.show-21"><span class="linenos">21</span></a>        <span class="k">if</span> <span class="n">dialog</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialog_list</span><span class="p">:</span>
-</span><span id="DialogManager.show-22"><a href="#DialogManager.show-22"><span class="linenos">22</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">add_dialog</span><span class="p">(</span><span class="n">dialog</span><span class="p">)</span>
-</span><span id="DialogManager.show-23"><a href="#DialogManager.show-23"><span class="linenos">23</span></a>            <span class="n">dialog</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</span><span id="DialogManager.show-24"><a href="#DialogManager.show-24"><span class="linenos">24</span></a>        <span class="k">else</span><span class="p">:</span>
-</span><span id="DialogManager.show-25"><a href="#DialogManager.show-25"><span class="linenos">25</span></a>            <span class="n">dialog</span><span class="o">.</span><span class="n">raise_</span><span class="p">()</span>
-</span><span id="DialogManager.show-26"><a href="#DialogManager.show-26"><span class="linenos">26</span></a>            <span class="n">dialog</span><span class="o">.</span><span class="n">activateWindow</span><span class="p">()</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DialogManager.show-11"><a href="#DialogManager.show-11"><span class="linenos">11</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dialog</span><span class="p">:</span> <span class="n">QDialog</span><span class="p">):</span>
+</span><span id="DialogManager.show-12"><a href="#DialogManager.show-12"><span class="linenos">12</span></a>        <span class="n">dialog_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">dialog</span><span class="p">)</span>
+</span><span id="DialogManager.show-13"><a href="#DialogManager.show-13"><span class="linenos">13</span></a>        <span class="k">if</span> <span class="n">dialog_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialogs</span><span class="p">:</span>
+</span><span id="DialogManager.show-14"><a href="#DialogManager.show-14"><span class="linenos">14</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">dialogs</span><span class="p">[</span><span class="n">dialog_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">dialog</span>
+</span><span id="DialogManager.show-15"><a href="#DialogManager.show-15"><span class="linenos">15</span></a>            <span class="n">dialog</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</span><span id="DialogManager.show-16"><a href="#DialogManager.show-16"><span class="linenos">16</span></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="DialogManager.show-17"><a href="#DialogManager.show-17"><span class="linenos">17</span></a>            <span class="n">existing</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialogs</span><span class="p">[</span><span class="n">dialog_type</span><span class="p">]</span>
+</span><span id="DialogManager.show-18"><a href="#DialogManager.show-18"><span class="linenos">18</span></a>            <span class="n">existing</span><span class="o">.</span><span class="n">raise_</span><span class="p">()</span>
+</span><span id="DialogManager.show-19"><a href="#DialogManager.show-19"><span class="linenos">19</span></a>            <span class="n">existing</span><span class="o">.</span><span class="n">activateWindow</span><span class="p">()</span>
 </span></pre></div>
 
 
-            <div class="docstring"><p>show or raise modeless, depending on already open</p>
-</div>
-
+    
 
                             </div>
                             <div id="DialogManager.exec" class="classattr">
@@ -269,20 +215,19 @@
 
     </div>
     <a class="headerlink" href="#DialogManager.exec"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DialogManager.exec-28"><a href="#DialogManager.exec-28"><span class="linenos">28</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">exec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dialog</span><span class="p">:</span> <span class="n">QDialog</span><span class="p">):</span>
-</span><span id="DialogManager.exec-29"><a href="#DialogManager.exec-29"><span class="linenos">29</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Executes the dialog modally if not already shown.&quot;&quot;&quot;</span>
-</span><span id="DialogManager.exec-30"><a href="#DialogManager.exec-30"><span class="linenos">30</span></a>        <span class="k">if</span> <span class="n">dialog</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialog_list</span><span class="p">:</span>
-</span><span id="DialogManager.exec-31"><a href="#DialogManager.exec-31"><span class="linenos">31</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">add_dialog</span><span class="p">(</span><span class="n">dialog</span><span class="p">)</span>
-</span><span id="DialogManager.exec-32"><a href="#DialogManager.exec-32"><span class="linenos">32</span></a>            <span class="n">dialog</span><span class="o">.</span><span class="n">exec</span><span class="p">()</span>
-</span><span id="DialogManager.exec-33"><a href="#DialogManager.exec-33"><span class="linenos">33</span></a>        <span class="k">else</span><span class="p">:</span>
-</span><span id="DialogManager.exec-34"><a href="#DialogManager.exec-34"><span class="linenos">34</span></a>            <span class="n">dialog</span><span class="o">.</span><span class="n">raise_</span><span class="p">()</span>
-</span><span id="DialogManager.exec-35"><a href="#DialogManager.exec-35"><span class="linenos">35</span></a>            <span class="n">dialog</span><span class="o">.</span><span class="n">activateWindow</span><span class="p">()</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DialogManager.exec-21"><a href="#DialogManager.exec-21"><span class="linenos">21</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">exec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dialog</span><span class="p">:</span> <span class="n">QDialog</span><span class="p">):</span>
+</span><span id="DialogManager.exec-22"><a href="#DialogManager.exec-22"><span class="linenos">22</span></a>        <span class="n">dialog_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">dialog</span><span class="p">)</span>
+</span><span id="DialogManager.exec-23"><a href="#DialogManager.exec-23"><span class="linenos">23</span></a>        <span class="k">if</span> <span class="n">dialog_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialogs</span><span class="p">:</span>
+</span><span id="DialogManager.exec-24"><a href="#DialogManager.exec-24"><span class="linenos">24</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">dialogs</span><span class="p">[</span><span class="n">dialog_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">dialog</span>
+</span><span id="DialogManager.exec-25"><a href="#DialogManager.exec-25"><span class="linenos">25</span></a>            <span class="n">dialog</span><span class="o">.</span><span class="n">exec</span><span class="p">()</span>
+</span><span id="DialogManager.exec-26"><a href="#DialogManager.exec-26"><span class="linenos">26</span></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="DialogManager.exec-27"><a href="#DialogManager.exec-27"><span class="linenos">27</span></a>            <span class="n">existing</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialogs</span><span class="p">[</span><span class="n">dialog_type</span><span class="p">]</span>
+</span><span id="DialogManager.exec-28"><a href="#DialogManager.exec-28"><span class="linenos">28</span></a>            <span class="n">existing</span><span class="o">.</span><span class="n">raise_</span><span class="p">()</span>
+</span><span id="DialogManager.exec-29"><a href="#DialogManager.exec-29"><span class="linenos">29</span></a>            <span class="n">existing</span><span class="o">.</span><span class="n">activateWindow</span><span class="p">()</span>
 </span></pre></div>
 
 
-            <div class="docstring"><p>Executes the dialog modally if not already shown.</p>
-</div>
-
+    
 
                             </div>
                             <div id="DialogManager.update" class="classattr">
@@ -296,18 +241,35 @@
 
     </div>
     <a class="headerlink" href="#DialogManager.update"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DialogManager.update-37"><a href="#DialogManager.update-37"><span class="linenos">37</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dialog_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">):</span>
-</span><span id="DialogManager.update-38"><a href="#DialogManager.update-38"><span class="linenos">38</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;update the selcted dialog&quot;&quot;&quot;</span>
-</span><span id="DialogManager.update-39"><a href="#DialogManager.update-39"><span class="linenos">39</span></a>        <span class="k">for</span> <span class="n">dialog</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialog_list</span><span class="p">:</span>
-</span><span id="DialogManager.update-40"><a href="#DialogManager.update-40"><span class="linenos">40</span></a>            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dialog</span><span class="p">,</span> <span class="n">dialog_type</span><span class="p">):</span>
-</span><span id="DialogManager.update-41"><a href="#DialogManager.update-41"><span class="linenos">41</span></a>                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dialog</span><span class="p">,</span> <span class="s2">&quot;refresh&quot;</span><span class="p">):</span>
-</span><span id="DialogManager.update-42"><a href="#DialogManager.update-42"><span class="linenos">42</span></a>                    <span class="n">dialog</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DialogManager.update-31"><a href="#DialogManager.update-31"><span class="linenos">31</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dialog_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">):</span>
+</span><span id="DialogManager.update-32"><a href="#DialogManager.update-32"><span class="linenos">32</span></a>        <span class="k">if</span> <span class="n">dialog_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialogs</span><span class="p">:</span>
+</span><span id="DialogManager.update-33"><a href="#DialogManager.update-33"><span class="linenos">33</span></a>            <span class="n">dialog</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialogs</span><span class="p">[</span><span class="n">dialog_type</span><span class="p">]</span>
+</span><span id="DialogManager.update-34"><a href="#DialogManager.update-34"><span class="linenos">34</span></a>            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dialog</span><span class="p">,</span> <span class="s2">&quot;refresh&quot;</span><span class="p">):</span>
+</span><span id="DialogManager.update-35"><a href="#DialogManager.update-35"><span class="linenos">35</span></a>                <span class="n">dialog</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span>
 </span></pre></div>
 
 
-            <div class="docstring"><p>update the selcted dialog</p>
-</div>
+    
 
+                            </div>
+                            <div id="DialogManager.remove" class="classattr">
+                                        <input id="DialogManager.remove-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">remove</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">dialog_type</span><span class="p">:</span> <span class="nb">type</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="DialogManager.remove-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#DialogManager.remove"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DialogManager.remove-37"><a href="#DialogManager.remove-37"><span class="linenos">37</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dialog_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">):</span>
+</span><span id="DialogManager.remove-38"><a href="#DialogManager.remove-38"><span class="linenos">38</span></a>        <span class="k">if</span> <span class="n">dialog_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialogs</span><span class="p">:</span>
+</span><span id="DialogManager.remove-39"><a href="#DialogManager.remove-39"><span class="linenos">39</span></a>            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialogs</span><span class="p">[</span><span class="n">dialog_type</span><span class="p">]</span>
+</span></pre></div>
+
+
+    
 
                             </div>
                 </section>

@@ -36,14 +36,14 @@
   <h1>CreatumLibre — Module Index</h1>
   <h3>Vector Graphics and Photo Editor</h3>
   
-    <div class="path">src/creatumlibre/graphics/boolean_operations/image_boolean.py</div>
+    <div class="path">src/creatumlibre/graphics/math/vector2d.py</div>
     <div class="classname">
-      <a href="https://umbrellabros.github.io/CreatumLibre/creatumlibre/graphics/boolean_operations/image_boolean.html">XY</a>
+      <a href="https://umbrellabros.github.io/CreatumLibre/creatumlibre/graphics/math/vector2d.html">Vector2D</a>
     </div>
     <div class="docstring">2D vector class with basic operations.</div>
     
     <div class="methods">
-        from_tuple · to_tuple · add · sub · max_XY · min_XY
+        from_tuple · copy · to_tuple · length · max_vector · min_vector
     </div>
     
   
@@ -54,7 +54,7 @@
     <div class="docstring">Handles selection modifications, mask updates, and dynamic resizing.</div>
     
     <div class="methods">
-        copy · set_bounding_rect · get_bounding_rect · get_mask · initialize_mask · update_mask · apply_mask
+        copy · set_mask_points · get_mask_points · set_bounding_rect · get_bounding_rect · get_mask · initialize_mask · update_mask · apply_mask
     </div>
     
   
@@ -84,10 +84,10 @@
     <div class="classname">
       <a href="https://umbrellabros.github.io/CreatumLibre/creatumlibre/ui/dialogs/dialog_manager.html">DialogManager</a>
     </div>
-    <div class="docstring">handle the open dialogs</div>
+    <div class="docstring">Handles all sorts of non-modal dialogs</div>
     
     <div class="methods">
-        add_dialog · remove_dialog · show · exec · update
+        show · exec · update · remove
     </div>
     
   
@@ -109,7 +109,18 @@
     <div class="docstring">Handles global key and mouse events.</div>
     
     <div class="methods">
-        map_event_to_image_coordinates · eventFilter · handle_mouse_press · handle_mouse_move · handle_mouse_release · create_new_image_object_from_selection · handle_key_press · process_rect_selection · set_clipboard · get_clipboard
+        map_event_to_image_coordinates · eventFilter · handle_mouse_press · handle_mouse_move · handle_mouse_release · create_new_image_object_from_selection · handle_key_press · process_rect_selection · set_clipboard · get_clipboard · finish_point_cloud
+    </div>
+    
+  
+    <div class="path">src/creatumlibre/ui/input/intersection_state.py</div>
+    <div class="classname">
+      <a href="https://umbrellabros.github.io/CreatumLibre/creatumlibre/ui/input/intersection_state.html">InteractionState</a>
+    </div>
+    <div class="docstring">Tracks the state of a mouse interaction (click, drag, release).</div>
+    
+    <div class="methods">
+        begin · update_old · update · is_click_on_selected_object · reset
     </div>
     
   
@@ -142,7 +153,7 @@
     <div class="docstring">Manages rectangular images (with optional masks) to produce one composited picture.</div>
     
     <div class="methods">
-        _add_new_image_by_filename · get_base_image · get_promoted_object · get_parent · get_base_object · show_resulting_image · _to_qpixmap · delete_object · add_object · set_selected_object_by_click · set_new_position · update_selected_position · clear_selection · clear_promoted · copy_promoted_to_clipboard · paste_clipboard · merge_selection
+        _add_new_image_by_filename · get_base_image · get_promoted_object · get_parent · get_base_object · show_resulting_image · _to_qpixmap · delete_object · add_object · get_object_at · set_selected_object_by_click · set_new_position · update_selected_position · clear_selection · clear_promoted · copy_promoted_to_clipboard · paste_clipboard · merge_selection
     </div>
     
   
