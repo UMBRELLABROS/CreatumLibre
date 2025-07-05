@@ -1,5 +1,7 @@
 import numpy as np
 
+from creatumlibre.graphics.math.vector2d import Vector2D
+
 
 class RegionManager:
     """Handles selection modifications, mask updates, and dynamic resizing."""
@@ -7,12 +9,19 @@ class RegionManager:
     def __init__(self):
         self.mask = None  # Stores selection mask (0-255)
         self.bounding_rect = None  # Stores current selection bounds
+        self.point_list: list[Vector2D] = []  # stores the point cloud selection
 
     def copy(self):
         new = RegionManager()
         new.mask = self.mask.copy()
         new.bounding_rect = self.bounding_rect
         return new
+
+    def set_mask_points(self, point_list: list[Vector2D] = None):
+        self.point_list = point_list
+
+    def get_mask_points(self) -> list[Vector2D]:
+        return self.point_list
 
     def set_bounding_rect(self, x: int, y: int, width: int, height: int):
         self.bounding_rect = (x, y, width, height)

@@ -1,7 +1,9 @@
 from PyQt6.QtCore import QEvent, QObject, Qt
 from PyQt6.QtGui import QKeySequence
 
+from creatumlibre.graphics.boolean_operations.image_boolean import Vector2D
 from creatumlibre.ui.dialogs.object_manager_dialog import ObjectManagerDialog
+from creatumlibre.ui.input.intersection_state import InteractionState
 from creatumlibre.ui.manager.image_handler import ImageHandler
 from creatumlibre.ui.mode.ui_input_mode import InputMode
 
@@ -12,10 +14,11 @@ class InputHandler(QObject):
     def __init__(self, parent):
         super().__init__()
         self.parent = parent  #  Reference to UI mode for event interpretation
-        self.start_pos = None
-        self.end_pos = None
         self.clipboard = None
         self.active_tab = None
+        self.interaction = InteractionState()
+        self.point_cloud_points: list[Vector2D] = []
+        self.mode = InputMode.IDLE
 
     def map_event_to_image_coordinates(self, event) -> tuple[int, int] | None:
         """Get the real position of the mouse within the image QLabel."""
@@ -48,9 +51,15 @@ class InputHandler(QObject):
 
     def eventFilter(self, _, event):
         """Intercept global events and delegate handling."""
+        self.mode = self.parent.ui_input_mode.get_mode()
+
         self.active_tab = self.parent.tab_manager.get_active_tab()
         if self.active_tab is None:
             return False
+        self.parent.tab_manager.tab_widget.setMouseTracking(
+            self.mode == InputMode.POINT_CLOUD
+        )
+        # print(widget.hasMouseTracking())
 
         if event.type() == QEvent.Type.MouseButtonPress:
             self.handle_mouse_press(event)
@@ -64,68 +73,73 @@ class InputHandler(QObject):
 
     def handle_mouse_press(self, event):
         """Handles mouse press based on current mode."""
-        mode = self.parent.ui_input_mode.get_mode()
-        print(f"General MODE:  {mode}")
-        modifiers = event.modifiers()
-        if mode == InputMode.SELECT_REGION:
-            self.start_pos = self.map_event_to_image_coordinates(event)
-            # set the active index by the region clicked
-
-            self.active_tab["manager"].set_selected_object_by_click(
-                self.start_pos, modifiers
-            )
-            print(f"Selection started at {self.start_pos}")
-
-        elif mode in [InputMode.IDLE, InputMode.MOVE_OBJECTS]:  # select objects
-            self.start_pos = self.map_event_to_image_coordinates(event)
-            if (
-                modifiers & Qt.KeyboardModifier.ControlModifier
-                or modifiers & Qt.KeyboardModifier.MetaModifier
-            ):
-                self.active_tab["manager"].set_selected_object_by_click(
-                    self.start_pos, modifiers
-                )
-                self.parent.tab_manager.refresh_active_tab_display()
-                print(f"IDLE Object Selection at {self.start_pos}, {mode}")
-                self.parent.ui_input_mode.set_mode(InputMode.MOVE_OBJECTS)
-
-        elif mode == InputMode.MOVE_OBJECTS:
-            self.start_pos = self.map_event_to_image_coordinates(event)
+        pos = Vector2D.from_tuple(self.map_event_to_image_coordinates(event))
+        clicked_object = self.active_tab["manager"].get_object_at(pos.to_tuple())
+        self.interaction.begin(pos, clicked_object)
 
     def handle_mouse_move(self, event):
         """Handles mouse movement feedback."""
-        mode = self.parent.ui_input_mode.get_mode()
-        print(f"MOVE MODE: {mode}")
-        if mode == InputMode.SELECT_REGION and self.start_pos:
-            self.end_pos = self.map_event_to_image_coordinates(event)
-            self.parent.update()
-            # just to show the rect
+
+        pos = Vector2D.from_tuple(self.map_event_to_image_coordinates(event))
+        print(pos.to_tuple())
+        delta = self.interaction.update(pos)
+
+        if self.interaction.drag_started:
+            self.active_tab["manager"].update_selected_position(delta)
+        else:
+            if self.mode in [InputMode.POINT_CLOUD]:
+                # trick to just to show the rect
+                print("....")
+                tmp_object = self.create_new_image_object_from_selection()
+                tmp_object.region_manager.set_mask_points(self.point_cloud_points)
+                self.parent.tab_manager.refresh_active_tab_display()
+                self.active_tab["manager"].delete_object(tmp_object)
+
+            return
+
+        if self.mode == InputMode.SELECT_REGION:
+            # trick to just to show the rect
             tmp_object = self.create_new_image_object_from_selection()
             self.parent.tab_manager.refresh_active_tab_display()
             self.active_tab["manager"].delete_object(tmp_object)
 
-        elif mode == InputMode.MOVE_OBJECTS and self.start_pos:
+        elif self.mode == InputMode.MOVE_OBJECTS:
+            self.active_tab["manager"].update_selected_position(delta)
+            print(delta.to_tuple())
             # paint everything
-            self.end_pos = self.map_event_to_image_coordinates(event)
-            # update pos of dragged objects
-            dx = self.end_pos[0] - self.start_pos[0]
-            dy = self.end_pos[1] - self.start_pos[1]
-
-            self.active_tab["manager"].update_selected_position(dx, dy)
             self.parent.tab_manager.refresh_active_tab_display()
 
     def handle_mouse_release(self, event):
         """Handles mouse release actions."""
-        mode = self.parent.ui_input_mode.get_mode()
-        if mode == InputMode.SELECT_REGION:
-            self.end_pos = self.map_event_to_image_coordinates(
-                event
-            )  # Set final end position
+
+        if self.interaction.drag_started:
+            self.active_tab["manager"].set_new_position()
+        else:
+            if self.mode == InputMode.IDLE:
+                self.active_tab["manager"].set_selected_object_by_click(
+                    self.interaction.start_pos.to_tuple(), event.modifiers()
+                )
+                self.parent.ui_input_mode.set_mode(InputMode.MOVE_OBJECTS)
+
+        if self.mode == InputMode.SELECT_REGION:
             self.create_new_image_object_from_selection()
             self.parent.ui_input_mode.set_mode(InputMode.IDLE)
-            print(f"selection end: {self.end_pos}")
-        elif mode == InputMode.MOVE_OBJECTS:
+        elif self.mode == InputMode.MOVE_OBJECTS:
             self.active_tab["manager"].set_new_position()
+        elif self.mode == InputMode.POINT_CLOUD:
+            pos = Vector2D.from_tuple(self.map_event_to_image_coordinates(event))
+
+            # Kurve schließen, wenn erster Punkt getroffen
+            if (
+                self.point_cloud_points
+                and (pos - self.point_cloud_points[0]).length() < 5
+            ):
+                self.finish_point_cloud()
+            else:
+                self.point_cloud_points.append(pos)
+
+        self.parent.tab_manager.refresh_active_tab_display()
+        self.interaction.reset()
 
     def create_new_image_object_from_selection(self) -> ImageHandler:
         """create new image object from selection"""
@@ -164,7 +178,7 @@ class InputHandler(QObject):
             self.active_tab["manager"].clear_promoted()
             self.parent.tab_manager.refresh_active_tab_display()
 
-        if (
+        elif (
             key_seq.matches(QKeySequence.StandardKey.Paste)
             == QKeySequence.SequenceMatch.ExactMatch
         ):
@@ -173,20 +187,28 @@ class InputHandler(QObject):
             self.active_tab["manager"].paste_clipboard(self.clipboard)
             print("Opening Object Manager Dialog (Cmd+V)")
 
-            self.parent.dialog_manager.show(
-                ObjectManagerDialog(self.active_tab["manager"])
-            )
+            if ObjectManagerDialog not in self.parent.dialog_manager.dialogs:
+                dialog = ObjectManagerDialog(self.active_tab["manager"])
+                self.parent.dialog_manager.show(dialog)
+            else:
+                self.parent.dialog_manager.show(
+                    self.parent.dialog_manager.dialogs[ObjectManagerDialog]
+                )
+
             self.parent.dialog_manager.update(ObjectManagerDialog)
             mode = self.parent.ui_input_mode.get_mode()
             print(f"mode after CUT OUT {mode}")
 
             self.parent.tab_manager.refresh_active_tab_display()
 
+        elif self.mode == InputMode.POINT_CLOUD and event.key() == Qt.Key.Key_Return:
+            self.finish_point_cloud()
+            self.parent.tab_manager.refresh_active_tab_display()
+
     def process_rect_selection(self):
         """Convert QPoint to integers and ensure correct ordering."""
-        x1, y1 = self.start_pos[0], self.start_pos[1]
-        x2, y2 = self.end_pos[0], self.end_pos[1]
-
+        x1, y1 = self.interaction.start_pos.to_tuple()
+        x2, y2 = self.interaction.last_pos.to_tuple()
         # Ensure coordinates are ordered correctly
         x_start, x_end = sorted([x1, x2])
         y_start, y_end = sorted([y1, y2])
@@ -200,3 +222,16 @@ class InputHandler(QObject):
     def get_clipboard(self) -> ImageHandler:
         """return image object from clipboard"""
         return self.clipboard
+
+    def finish_point_cloud(self):
+        if len(self.point_cloud_points) < 3:
+            print("Nicht genug Punkte für eine Maske.")
+            self.point_cloud_points.clear()
+            return
+
+        print(f"Punktwolke abgeschlossen mit {len(self.point_cloud_points)} Punkten")
+        for p in self.point_cloud_points:
+            print(f"Punkt: {p.to_tuple()}")
+        self.point_cloud_points.clear()
+        self.parent.ui_input_mode.set_mode(InputMode.IDLE)
+        self.parent.tab_manager.refresh_active_tab_display()

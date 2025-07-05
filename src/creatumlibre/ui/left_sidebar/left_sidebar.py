@@ -32,14 +32,23 @@ class LeftSidebar(QWidget):
             "src/creatumlibre/assets/region.png",
             lambda: self.parent.ui_input_mode.set_mode(InputMode.SELECT_REGION),
         )
+        self.btn_select_point_cloud = self._create_tool_button(
+            "src/creatumlibre/assets/cloud_select.png",
+            lambda: self.parent.ui_input_mode.set_mode(InputMode.POINT_CLOUD),
+        )
 
         sidebar_layout.addWidget(self.btn_color_adjustment)
         sidebar_layout.addWidget(self.btn_region)
+        sidebar_layout.addWidget(self.btn_select_point_cloud)
 
         self.setLayout(sidebar_layout)
 
         # Add buttons to parent's sidebar layout
-        for button in [self.btn_color_adjustment, self.btn_region]:
+        for button in [
+            self.btn_color_adjustment,
+            self.btn_region,
+            self.btn_select_point_cloud,
+        ]:
             parent.left_sidebar_layout.addWidget(button)
             button.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
 

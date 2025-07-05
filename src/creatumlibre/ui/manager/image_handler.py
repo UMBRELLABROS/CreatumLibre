@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 from PyQt6.QtGui import QImage, QPixmap
 
+from creatumlibre.graphics.boolean_operations.image_boolean import Vector2D
 from creatumlibre.graphics.selection.region_manager import RegionManager
 from creatumlibre.ui.mode.ui_input_mode import TransformMode
 
@@ -17,18 +18,31 @@ color_dict = {
 class ImageHandler:
     """Handles a single image object: pixel data, selection, and position."""
 
-    def __init__(self, image_array: np.ndarray, position=(0, 0), is_promoted=False):
+    def __init__(self, image_array: np.ndarray, position: Vector2D, is_promoted=False):
+
+        if not isinstance(position, Vector2D):
+            raise TypeError(
+                f"Expected Vector2D for position, got {type(position).__name__}"
+            )
+
         self.original_image = image_array  # BGR format
         self.position = position  # Absolute position in scene (e.g., top-left)
-        self.position_before_drag = position  # reference to add dx,dy while dragging
+        self.position_before_drag = (
+            position.copy()
+        )  # reference to add dx,dy while dragging
         self.is_promoted = is_promoted
         self.is_selected = False
         self.region_manager = RegionManager()
         self.region_manager.initialize_mask(self.original_image.shape)
 
     def copy(self):
-        new = ImageHandler(self.original_image.copy())
-        new.position = self.position  # Assuming it's immutable (like a tuple)
+        if not isinstance(self.position, Vector2D):
+            raise TypeError(
+                f"Expected Vector2D for position, got {type(self.position).__name__}"
+            )
+
+        new = ImageHandler(self.original_image.copy(), self.position)
+        new.position_before_drag = self.position_before_drag.copy()
         new.is_promoted = False
         new.is_selected = False
         new.region_manager = self.region_manager.copy()
@@ -38,10 +52,10 @@ class ImageHandler:
         """Returns the raw image array."""
         return self.original_image
 
-    def contains_point(self, click_position: tuple[int, int]) -> bool:
+    def contains_point(self, click_position: Vector2D) -> bool:
         """hit test in object coordinates"""
         x, y = click_position
-        px, py = self.get_position()
+        px, py = self.get_position().to_tuple()
         h, w = self.original_image.shape[:2]
         return px <= x <= px + w and py <= y <= py + h
 
@@ -60,11 +74,11 @@ class ImageHandler:
     def set_image(self, image):
         self.original_image = image
 
-    def set_position(self, position: tuple):
+    def set_position(self, position: Vector2D):
         """set global position"""
         self.position = position
 
-    def get_position(self) -> tuple:
+    def get_position(self) -> Vector2D:
         """Returns the (x, y) position in global scene space."""
         return self.position
 
@@ -87,7 +101,7 @@ class ImageHandler:
         # cropped_mask = selection_mask[y:y+h, x:x+w].copy()
 
         new_object = ImageHandler(
-            image_array=selected_region, position=(x, y), is_promoted=True
+            image_array=selected_region, position=Vector2D(x, y), is_promoted=True
         )
 
         return new_object
@@ -95,17 +109,40 @@ class ImageHandler:
     def draw_selection_frame(
         self, transform_mode: TransformMode, zoom_factor: float = 1.0
     ):
-        """Draws a selection frame with optional handles on this image."""
+        """Draws a selection frame and optionally a point cloud overlay."""
         img = self.original_image
         h, w = img.shape[:2]
         if h < 4 or w < 4:
             return
-        color = color_dict[transform_mode]
-        thickness = int(1 / zoom_factor)
 
-        # Draw border
+        color = color_dict[transform_mode]
+        thickness = max(1, int(1 / zoom_factor))
+
+        # Draw bounding rectangle
         cv2.rectangle(img, (0, 0), (w - 1, h - 1), color, thickness)
         print(transform_mode)
+
+        # Optional: draw point cloud overlay
+        if transform_mode == TransformMode.NONE and (
+            point_cloud := self.region_manager.get_mask_points()
+        ):
+
+            print("POINT CLOUD ------------")
+
+            for i in range(1, len(point_cloud)):
+                cv2.line(
+                    img,
+                    point_cloud[i - 1].to_tuple(),
+                    point_cloud[i].to_tuple(),
+                    (0, 255, 255),
+                    thickness,
+                )
+
+            # Draw points
+            for pt in point_cloud:
+                cv2.circle(
+                    img, pt.to_tuple(), radius=3, color=(0, 255, 255), thickness=-1
+                )
 
         # Add 9-resize handles, rotate pivot, etc.
         # For example, draw corner point:

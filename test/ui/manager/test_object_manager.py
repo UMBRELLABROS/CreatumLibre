@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 import pytest
 
+from creatumlibre.graphics.math.vector2d import Vector2D
 from creatumlibre.ui.manager.image_handler import ImageHandler
 from creatumlibre.ui.manager.object_manager import ObjectManager
 
@@ -15,7 +16,7 @@ def dummy_image():
 
 @pytest.fixture
 def image_handler(dummy_image):
-    return ImageHandler(dummy_image, position=(0, 0), is_promoted=False)
+    return ImageHandler(dummy_image, position=Vector2D(0, 0), is_promoted=False)
 
 
 @pytest.fixture
